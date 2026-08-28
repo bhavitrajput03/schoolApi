@@ -1,0 +1,5 @@
+.env
+/logs/*.log
+!.gitkeep
+/.driver-temp/
+/Windows_5.12.0RTW.zip
