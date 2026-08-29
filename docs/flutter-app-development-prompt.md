@@ -274,10 +274,19 @@ Example `data`:
     "admissionNo": "1021",
     "rollNo": "1",
     "fatherName": "Rajesh Kumar",
+    "marksEntryId": 1050,
+    "termOptionId": 31,
+    "subSubjectId": 102,
+    "marksStudentId": 14687,
     "maxMarks": 80,
+    "minMarks": 0,
     "obtainedMarks": 72,
+    "percentage": 90,
     "isAbsent": false,
-    "isMedical": false
+    "isMedical": false,
+    "serial": null,
+    "ownerSessionId": 13,
+    "isDefault": false
   }
 ]
 ```
@@ -312,7 +321,21 @@ Example `data`:
 
 ```json
 {
-  "saved": 1
+  "saved": 1,
+  "classId": 155,
+  "sectionId": 61,
+  "termOptionId": 39,
+  "marks": [
+    {
+      "studentId": 14687,
+      "subjectId": 40,
+      "maxMarks": 80,
+      "obtainedMarks": 72,
+      "percentage": 90,
+      "isAbsent": false,
+      "isMedical": false
+    }
+  ]
 }
 ```
 
@@ -335,10 +358,19 @@ Example `data`:
     {
       "subjectId": 40,
       "subjectName": "Mathematics",
+      "marksEntryId": 1050,
+      "termOptionId": 31,
+      "subSubjectId": 102,
+      "studentId": 14687,
       "maxMarks": 80,
+      "minMarks": 0,
       "obtainedMarks": 72,
+      "percentage": 90,
       "isAbsent": false,
-      "isMedical": false
+      "isMedical": false,
+      "serial": null,
+      "ownerSessionId": 13,
+      "isDefault": false
     }
   ]
 }
@@ -377,7 +409,30 @@ Example `data`:
 
 ```json
 {
-  "saved": 2
+  "saved": 2,
+  "classId": 155,
+  "sectionId": 61,
+  "termOptionId": 39,
+  "marks": [
+    {
+      "studentId": 14687,
+      "subjectId": 40,
+      "maxMarks": 80,
+      "obtainedMarks": 72,
+      "percentage": 90,
+      "isAbsent": false,
+      "isMedical": false
+    },
+    {
+      "studentId": 14687,
+      "subjectId": 41,
+      "maxMarks": 80,
+      "obtainedMarks": 68,
+      "percentage": 85,
+      "isAbsent": false,
+      "isMedical": false
+    }
+  ]
 }
 ```
 

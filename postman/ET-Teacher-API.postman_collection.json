@@ -21,7 +21,7 @@
     {"key": "sectionId", "value": "61", "type": "string"},
     {"key": "subjectId", "value": "40", "type": "string"},
     {"key": "secondSubjectId", "value": "41", "type": "string"},
-    {"key": "termOptionId", "value": "39", "type": "string"},
+    {"key": "termOptionId", "value": "38", "type": "string"},
     {"key": "studentId", "value": "14687", "type": "string"},
     {"key": "attendanceDate", "value": "2026-08-28", "type": "string"}
   ],
