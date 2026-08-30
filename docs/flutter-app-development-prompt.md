@@ -260,6 +260,47 @@ Use `optionId` as `termOptionId` in marks APIs.
 
 ## Subject-wise marks APIs
 
+### Load configured maximum marks
+
+`GET /api/marks/max-marks?classId={classId}&sectionId={sectionId}&termOptionId={termOptionId}`
+
+Example `data`:
+
+```json
+{
+  "subjects": [
+    {"subjectId": 40, "subjectName": "Mathematics", "maxMarks": 80},
+    {"subjectId": 41, "subjectName": "Science", "maxMarks": 80}
+  ]
+}
+```
+
+Subjects without configuration are omitted; the client may display 80 as its unsaved default.
+
+### Save configured maximum marks
+
+`POST /api/marks/max-marks`
+
+```json
+{
+  "classId": 155,
+  "sectionId": 61,
+  "termOptionId": 38,
+  "subjects": [
+    {"subjectId": 40, "maxMarks": 80},
+    {"subjectId": 41, "maxMarks": 80}
+  ]
+}
+```
+
+Example `data`:
+
+```json
+{"updated": 2}
+```
+
+Each `maxMarks` must be an integer from 1 through 1000. Once configured, this value is authoritative in subject-wise and student-wise marks GET/save flows.
+
 ### Load students and existing marks
 
 `GET /api/marks/subject-wise/students?classId={classId}&sectionId={sectionId}&termOptionId={termOptionId}&subjectId={subjectId}`

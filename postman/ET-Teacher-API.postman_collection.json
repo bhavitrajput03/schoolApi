@@ -122,6 +122,30 @@
       "name": "04 Marks",
       "item": [
         {
+          "name": "Get Max Marks",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/api/marks/max-marks?classId={{classId}}&sectionId={{sectionId}}&termOptionId={{termOptionId}}",
+              "host": ["{{baseUrl}}"], "path": ["api","marks","max-marks"],
+              "query": [
+                {"key": "classId", "value": "{{classId}}"},
+                {"key": "sectionId", "value": "{{sectionId}}"},
+                {"key": "termOptionId", "value": "{{termOptionId}}"}
+              ]
+            }
+          }
+        },
+        {
+          "name": "WRITE - Update Max Marks",
+          "request": {
+            "method": "POST",
+            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "body": {"mode": "raw", "raw": "{\n  \"classId\": {{classId}},\n  \"sectionId\": {{sectionId}},\n  \"termOptionId\": {{termOptionId}},\n  \"subjects\": [\n    {\"subjectId\": {{subjectId}}, \"maxMarks\": 80},\n    {\"subjectId\": {{secondSubjectId}}, \"maxMarks\": 80}\n  ]\n}"},
+            "url": {"raw": "{{baseUrl}}/api/marks/max-marks", "host": ["{{baseUrl}}"], "path": ["api","marks","max-marks"]}
+          }
+        },
+        {
           "name": "Subject-wise Students",
           "request": {
             "method": "GET",

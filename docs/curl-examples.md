@@ -13,6 +13,7 @@ Set TOKEN to the accessToken returned by login.
 
 ## Teacher and exams
 
+
     curl.exe "http://localhost/school/public/api/teacher/dashboard" -H "Authorization: Bearer TOKEN"
     curl.exe "http://localhost/school/public/api/teacher/classes" -H "Authorization: Bearer TOKEN"
     curl.exe "http://localhost/school/public/api/teacher/classes/155/sections" -H "Authorization: Bearer TOKEN"
@@ -22,7 +23,9 @@ Set TOKEN to the accessToken returned by login.
 
 ## Subject-wise marks
 
-    curl.exe "http://localhost/school/public/api/marks/subject-wise/students?classId=155&sectionId=61&termOptionId=39&subjectId=40" -H "Authorization: Bearer TOKEN"
+    curl.exe "http://localhost/school/public/api/marks/max-marks?classId=155&sectionId=61&termOptionId=38" -H "Authorization: Bearer TOKEN"
+    curl.exe -X POST "http://localhost/school/public/api/marks/max-marks" -H "Authorization: Bearer TOKEN" -H "Content-Type: application/json" -d "{\"classId\":155,\"sectionId\":61,\"termOptionId\":38,\"subjects\":[{\"subjectId\":40,\"maxMarks\":80},{\"subjectId\":41,\"maxMarks\":80}]}"
+    curl.exe "http://localhost/school/public/api/marks/subject-wise/students?classId=155&sectionId=61&termOptionId=38&subjectId=40" -H "Authorization: Bearer TOKEN"
     curl.exe -X POST "http://localhost/school/public/api/marks/subject-wise" -H "Authorization: Bearer TOKEN" -H "Content-Type: application/json" -d "{\"classId\":155,\"sectionId\":61,\"termOptionId\":39,\"subjectId\":40,\"maxMarks\":80,\"marks\":[{\"studentId\":14687,\"obtainedMarks\":72,\"isAbsent\":false,\"isMedical\":false}]}"
 
 ## Student-wise marks

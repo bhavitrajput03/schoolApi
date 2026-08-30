@@ -10,12 +10,12 @@ This project is deployed as a separate Generic PHP 8.2 site.
 - Nginx fallback: `try_files $uri $uri/ /index.php?$query_string;`
 - Forward bearer auth: `fastcgi_param HTTP_AUTHORIZATION $http_authorization;`
 
-## Database
+## Databases
 
-- SQL Server endpoint: `127.0.0.1,1433`
-- Database: `SchoolManagement`
-- Use a dedicated `school_api` login with only `db_datareader` and `db_datawriter`.
-- Run `database/001_api_security.sql` with `SchoolManagement` selected.
+- Central SQL Server database `admineyetab` contains only `dbo.SchoolConnection` routing rows.
+- Each school row contains `SchoolCode` and its full tenant SQL Server connection string.
+- `.env` contains only the bootstrap `ADMIN_DB_CONNECTION_STRING` needed to reach `admineyetab`.
+- Every tenant SQL database must contain the API security tables and use a least-privilege SQL login.
 
 ## Environment
 

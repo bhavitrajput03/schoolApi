@@ -17,6 +17,8 @@ final class App {
             ['GET','#^/api/teacher/classes/(\d+)/sections/(\d+)/subjects$#',[TeacherController::class,'subjects'],true],
             ['GET','#^/api/teacher/classes/(\d+)/sections/(\d+)/students$#',[TeacherController::class,'students'],true],
             ['GET','#^/api/exams/terms$#',[ExamController::class,'terms'],true],
+            ['GET','#^/api/marks/max-marks$#',[MarksController::class,'maxMarks'],true],
+            ['POST','#^/api/marks/max-marks$#',[MarksController::class,'saveMaxMarks'],true],
             ['GET','#^/api/marks/subject-wise/students$#',[MarksController::class,'subjectStudents'],true],
             ['POST','#^/api/marks/subject-wise$#',[MarksController::class,'saveSubjectWise'],true],
             ['GET','#^/api/marks/student-wise/(\d+)$#',[MarksController::class,'studentWise'],true],

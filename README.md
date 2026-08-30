@@ -1,32 +1,34 @@
 # ET Teacher PHP API
 
-Secure PHP 8 API for the restored tmpgolden SQL Server database. Legacy tables remain the source for classes, students, exams, marks and attendance. API credentials and tokens use isolated modern tables.
+Secure PHP 8 multi-school API. A central SQL Server database named `admineyetab` contains the `SchoolConnection` routing table; each school's users, classes, students, exams, marks and attendance remain in its own SQL Server database.
 
 ## Setup
 
-1. Enable Microsoft pdo_sqlsrv and sqlsrv extensions for the PHP version selected in WAMP.
-2. Copy .env.example to .env. Add SQL credentials if Windows Authentication is unavailable to Apache.
-3. Run database/001_api_security.sql in SSMS against tmpgolden.
-4. Create a teacher login:
+1. Enable `pdo_sqlsrv` and `sqlsrv` for the selected PHP version.
+2. Run `database/admin/001_admin_school_registry.sql` to create the central `admineyetab` registry.
+3. Copy `.env.example` to `.env`; configure `ADMIN_DB_CONNECTION_STRING` for `admineyetab`.
+4. Register each school SQL Server connection using `bin/register-school.php`.
+5. For a fresh tenant run `database/001_api_security.sql` and `database/002_marks_unique.sql`. For an existing tenant run `database/003_teacher_subject_max_marks.sql` once; it safely renames only `ApiUser` to `SchoolTeacher`, creates `AppSubjectMaxMark`, and copies existing max-mark values. An unrelated `Teacher` table is never changed.
+6. Create a teacher login:
 
     php bin/create-user.php B anita "Anita Sharma" "StrongPassword@123" teacher 218
 
-5. Assign only authorized class/section/subjects. Current academic session is 13:
+7. Assign only authorized class/section/subjects. Current academic session is 13:
 
-    php bin/assign-teacher.php anita 13 155 61 40
-    php bin/assign-teacher.php anita 13 155 61 41
+    php bin/assign-teacher.php B anita 13 155 61 40
+    php bin/assign-teacher.php B anita 13 155 61 41
 
-6. Enable Apache mod_rewrite and test POST http://localhost/school/public/api/auth/login.
+8. Enable Apache mod_rewrite and test POST http://localhost/school/public/api/auth/login.
 
 All request examples are in docs/curl-examples.md.
 
 ## Security
 
-- Argon2id password hashes; legacy UserName.UserPwd is intentionally not used.
-- Random opaque bearer tokens; the database stores only SHA-256 token hashes.
+- Argon2id password hashes. Legacy plain-text values found in `SchoolTeacher.PasswordHash` can authenticate once and are immediately upgraded to a secure hash; plain text is never written by the API.
+- Random tenant-routed opaque bearer tokens; tenant SQL databases store only SHA-256 token hashes.
+- Each `admineyetab.dbo.SchoolConnection` row stores one school's full SQL connection string. Restrict this table and its SQL login because the connection string contains credentials.
 - Expiring/revocable sessions; password changes revoke other sessions.
 - Login throttling, prepared SQL, validation and teacher-assignment authorization.
 - Transaction-safe batch marks and attendance.
 - Allowlisted CORS, no-store responses, hidden server errors and disabled directory listing.
 - Production must use HTTPS and a least-privilege SQL login.
-
