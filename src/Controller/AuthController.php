@@ -1,7 +1,7 @@
 <?php
 declare(strict_types=1);
 namespace App\Controller;
-use App\Core\{Auth,Database,Request,Response,Validator};
+use App\Core\{Auth,Database,LoginPassword,Request,Response,Validator};
 use App\Service\SchoolService;
 final class AuthController {
     public function login(Request $r): never {
@@ -11,10 +11,9 @@ final class AuthController {
         if((int)$st->fetchColumn()>=5)Response::error('Too many login attempts. Try again after 15 minutes.',429,'RATE_LIMITED');
         $st=$db->prepare('SELECT u.ApiUserID,u.PasswordHash,u.DisplayName,u.Username,u.Role,u.EmployeeID,u.SchoolBranchID FROM SchoolTeacher u WHERE LOWER(u.Username)=? AND u.IsActive=1');$st->execute([$username]);$user=$st->fetch();
         $plainPassword=(string)$d['password'];$storedPassword=(string)($user['PasswordHash']??'');
-        if(!$user||!self::passwordMatches($plainPassword,$storedPassword)){$db->prepare('INSERT INTO ApiLoginAttempt(AttemptKey,AttemptedAt) VALUES(?,SYSUTCDATETIME())')->execute([$key]);Response::error('Invalid school code, username or password.',401,'INVALID_CREDENTIALS');}
-        $passwordInfo=password_get_info($storedPassword);$algorithm=defined('PASSWORD_ARGON2ID')?PASSWORD_ARGON2ID:PASSWORD_DEFAULT;
-        if(($passwordInfo['algoName']??'unknown')==='unknown'||password_needs_rehash($storedPassword,$algorithm)){
-            $db->prepare('UPDATE SchoolTeacher SET PasswordHash=?,PasswordChangedAt=SYSUTCDATETIME() WHERE ApiUserID=?')->execute([password_hash($plainPassword,$algorithm),$user['ApiUserID']]);
+        if(!$user||!LoginPassword::matches($plainPassword,$storedPassword)){$db->prepare('INSERT INTO ApiLoginAttempt(AttemptKey,AttemptedAt) VALUES(?,SYSUTCDATETIME())')->execute([$key]);Response::error('Invalid school code, username or password.',401,'INVALID_CREDENTIALS');}
+        if(LoginPassword::needsUpgrade($plainPassword,$storedPassword)){
+            $db->prepare('UPDATE SchoolTeacher SET PasswordHash=?,PasswordChangedAt=SYSUTCDATETIME() WHERE ApiUserID=?')->execute([LoginPassword::hash($plainPassword),$user['ApiUserID']]);
         }
         $db->prepare('DELETE FROM ApiLoginAttempt WHERE AttemptKey=?')->execute([$key]);$db->prepare('UPDATE SchoolTeacher SET LastLoginAt=SYSUTCDATETIME() WHERE ApiUserID=?')->execute([$user['ApiUserID']]);unset($user['PasswordHash']);
         Response::success([
@@ -28,15 +27,9 @@ final class AuthController {
     public function changePassword(Request $r,array $user): never {
         $d=$r->json();Validator::required($d,['currentPassword','newPassword']);$new=(string)$d['newPassword'];
         if(strlen($new)<12||!preg_match('/[A-Z]/',$new)||!preg_match('/[a-z]/',$new)||!preg_match('/\d/',$new)||!preg_match('/[^A-Za-z0-9]/',$new))Response::error('New password must be at least 12 characters and include upper, lower, number and symbol.',422,'WEAK_PASSWORD');
-        $db=Database::connection();$st=$db->prepare('SELECT PasswordHash FROM SchoolTeacher WHERE ApiUserID=?');$st->execute([$user['ApiUserID']]);if(!self::passwordMatches((string)$d['currentPassword'],(string)$st->fetchColumn()))Response::error('Current password is incorrect.',422,'INVALID_PASSWORD');
-        $hash=password_hash($new,defined('PASSWORD_ARGON2ID')?PASSWORD_ARGON2ID:PASSWORD_DEFAULT);$db->beginTransaction();
+        $db=Database::connection();$st=$db->prepare('SELECT PasswordHash FROM SchoolTeacher WHERE ApiUserID=?');$st->execute([$user['ApiUserID']]);if(!LoginPassword::matches((string)$d['currentPassword'],(string)$st->fetchColumn()))Response::error('Current password is incorrect.',422,'INVALID_PASSWORD');
+        $hash=LoginPassword::hash($new);$db->beginTransaction();
         try{$db->prepare('UPDATE SchoolTeacher SET PasswordHash=?,PasswordChangedAt=SYSUTCDATETIME() WHERE ApiUserID=?')->execute([$hash,$user['ApiUserID']]);$db->prepare('UPDATE ApiAuthToken SET RevokedAt=SYSUTCDATETIME() WHERE ApiUserID=? AND TokenHash<>? AND RevokedAt IS NULL')->execute([$user['ApiUserID'],$user['_tokenHash']]);$db->commit();}catch(\Throwable $e){$db->rollBack();throw$e;}
         Response::success(['message'=>'Password changed. Other sessions were signed out.']);
-    }
-    private static function passwordMatches(string $provided,string $stored):bool{
-        $info=password_get_info($stored);
-        return($info['algoName']??'unknown')==='unknown'
-            ?hash_equals($stored,$provided)
-            :password_verify($provided,$stored);
     }
 }

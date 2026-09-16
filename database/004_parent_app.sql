@@ -52,14 +52,13 @@ CREATE TABLE dbo.AppHomework(
 IF OBJECT_ID(N'dbo.AppClassTeacher',N'U') IS NULL
 CREATE TABLE dbo.AppClassTeacher(
  AppClassTeacherID bigint IDENTITY(1,1) NOT NULL CONSTRAINT PK_AppClassTeacher PRIMARY KEY,
- OwnerSessionID bigint NOT NULL,ClassID bigint NOT NULL,SectionID bigint NOT NULL,ApiUserID uniqueidentifier NOT NULL,
+ OwnerSessionID bigint NOT NULL,ClassID bigint NOT NULL,SectionID bigint NOT NULL,ApiUserID varchar(64) NOT NULL,
  TeacherRole varchar(30) NOT NULL,IsActive bit NOT NULL CONSTRAINT DF_AppClassTeacher_Active DEFAULT 1,
  CONSTRAINT CK_AppClassTeacher_Role CHECK(TeacherRole IN('class_teacher','co_class_teacher')),
  CONSTRAINT UQ_AppClassTeacher UNIQUE(OwnerSessionID,ClassID,SectionID,ApiUserID,TeacherRole),
  CONSTRAINT FK_AppClassTeacher_Session FOREIGN KEY(OwnerSessionID) REFERENCES dbo.OwnerSession(OwnerSessionID),
  CONSTRAINT FK_AppClassTeacher_Class FOREIGN KEY(ClassID) REFERENCES dbo.ClassMaster(ClassmasterID),
- CONSTRAINT FK_AppClassTeacher_Section FOREIGN KEY(SectionID) REFERENCES dbo.SectionMaster(SectionMasterID),
- CONSTRAINT FK_AppClassTeacher_User FOREIGN KEY(ApiUserID) REFERENCES dbo.SchoolTeacher(ApiUserID));
+ CONSTRAINT FK_AppClassTeacher_Section FOREIGN KEY(SectionID) REFERENCES dbo.SectionMaster(SectionMasterID));
 
 IF OBJECT_ID(N'dbo.AppNotice',N'U') IS NULL
 CREATE TABLE dbo.AppNotice(

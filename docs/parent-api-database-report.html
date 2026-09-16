@@ -150,7 +150,7 @@ IF @@ROWCOUNT=0 INSERT INTO AppParentDevice ...;</pre>
     <h2>6. Operational notes</h2>
     <ul>
       <li>All protected student endpoints first call the common parent-child authorization query.</li>
-      <li>Passwords may be legacy plain text once; successful login upgrades them to a secure PHP password hash.</li>
+      <li>School code, usernames/parent codes and passwords are case-insensitive. Legacy plain text and old mixed-case hashes are upgraded to a normalized secure hash after a successful compatible login.</li>
       <li>Only token hashes are stored; raw bearer and refresh tokens are not saved.</li>
       <li>Fee totals depend on the actual legacy column names present in each tenant. The implementation checks common aliases such as NetFee, Amount, FeeAmount, Discount and ReceiveAmount.</li>
       <li>Payment rows are implemented, but real money collection still needs a selected gateway adapter and credentials.</li>

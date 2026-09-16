@@ -28,6 +28,8 @@ Example parent login:
 
 The response includes `parent`, the date-selected `academicSession`, and `auth.accessToken`/`auth.refreshToken`.
 
+School code, teacher username, parent code/user ID, and login passwords are matched case-insensitively. New and changed passwords are stored as hashes of their normalized lowercase form. An existing mixed-case password hash must be entered with its original case once; that successful login upgrades it for future case-insensitive use.
+
 ## Parent and student
 
 - `GET /api/parent/profile`
