@@ -1,0 +1,1422 @@
+{
+    "info": {
+        "_postman_id": "979ce995-160a-4f2b-a8f0-57df40fc0126",
+        "name": "ET Parent API",
+        "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+    },
+    "item": [
+        {
+            "name": "Authentication",
+            "item": [
+                {
+                    "name": "Parent Login",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json",
+                                "type": "text"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{baseUrl}}/api/auth/login",
+                            "host": [
+                                "{{baseUrl}}/api/auth/login"
+                            ]
+                        },
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n    \"schoolCode\": \"{{schoolCode}}\",\n    \"parentCode\": \"{{parentCode}}\",\n    \"password\": \"{{password}}\"\n}",
+                            "options": {
+                                "raw": {
+                                    "language": "json"
+                                }
+                            }
+                        }
+                    },
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "pm.test('Success status',()=>pm.expect(pm.response.code).to.be.below(500));",
+                                    "let j=pm.response.json(); if(j.success){pm.environment.set('accessToken',j.data.auth.accessToken);pm.environment.set('refreshToken',j.data.auth.refreshToken);}"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "name": "Refresh Token",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json",
+                                "type": "text"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{baseUrl}}/api/auth/refresh-token",
+                            "host": [
+                                "{{baseUrl}}/api/auth/refresh-token"
+                            ]
+                        },
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n    \"refreshToken\": \"{{refreshToken}}\"\n}",
+                            "options": {
+                                "raw": {
+                                    "language": "json"
+                                }
+                            }
+                        }
+                    },
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "pm.test('Success status',()=>pm.expect(pm.response.code).to.be.below(500));",
+                                    "let j=pm.response.json(); if(j.success){pm.environment.set('accessToken',j.data.auth.accessToken);pm.environment.set('refreshToken',j.data.auth.refreshToken);}"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "name": "Logout",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{accessToken}}",
+                                "type": "text"
+                            },
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json",
+                                "type": "text"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{baseUrl}}/api/auth/logout",
+                            "host": [
+                                "{{baseUrl}}/api/auth/logout"
+                            ]
+                        },
+                        "body": {
+                            "mode": "raw",
+                            "raw": "[]",
+                            "options": {
+                                "raw": {
+                                    "language": "json"
+                                }
+                            }
+                        }
+                    },
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "pm.test('Success status',()=>pm.expect(pm.response.code).to.be.below(500));"
+                                ]
+                            }
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "name": "Parent & Students",
+            "item": [
+                {
+                    "name": "Profile",
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{accessToken}}",
+                                "type": "text"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{baseUrl}}/api/parent/profile",
+                            "host": [
+                                "{{baseUrl}}/api/parent/profile"
+                            ]
+                        }
+                    },
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "pm.test('Success status',()=>pm.expect(pm.response.code).to.be.below(500));"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "name": "Students",
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{accessToken}}",
+                                "type": "text"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{baseUrl}}/api/parent/students",
+                            "host": [
+                                "{{baseUrl}}/api/parent/students"
+                            ]
+                        }
+                    },
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "pm.test('Success status',()=>pm.expect(pm.response.code).to.be.below(500));"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "name": "Student Profile",
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{accessToken}}",
+                                "type": "text"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{baseUrl}}/api/students/{{studentId}}",
+                            "host": [
+                                "{{baseUrl}}/api/students/{{studentId}}"
+                            ]
+                        }
+                    },
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "pm.test('Success status',()=>pm.expect(pm.response.code).to.be.below(500));"
+                                ]
+                            }
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "name": "Dashboard",
+            "item": [
+                {
+                    "name": "Student Dashboard",
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{accessToken}}",
+                                "type": "text"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{baseUrl}}/api/students/{{studentId}}/dashboard",
+                            "host": [
+                                "{{baseUrl}}/api/students/{{studentId}}/dashboard"
+                            ]
+                        }
+                    },
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "pm.test('Success status',()=>pm.expect(pm.response.code).to.be.below(500));"
+                                ]
+                            }
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "name": "Attendance",
+            "item": [
+                {
+                    "name": "Attendance Summary",
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{accessToken}}",
+                                "type": "text"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{baseUrl}}/api/students/{{studentId}}/attendance/summary?from={{fromDate}}&to={{toDate}}",
+                            "host": [
+                                "{{baseUrl}}/api/students/{{studentId}}/attendance/summary?from={{fromDate}}&to={{toDate}}"
+                            ]
+                        }
+                    },
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "pm.test('Success status',()=>pm.expect(pm.response.code).to.be.below(500));"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "name": "Attendance History",
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{accessToken}}",
+                                "type": "text"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{baseUrl}}/api/students/{{studentId}}/attendance?from={{fromDate}}&to={{toDate}}",
+                            "host": [
+                                "{{baseUrl}}/api/students/{{studentId}}/attendance?from={{fromDate}}&to={{toDate}}"
+                            ]
+                        }
+                    },
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "pm.test('Success status',()=>pm.expect(pm.response.code).to.be.below(500));"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "name": "Attendance Calendar",
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{accessToken}}",
+                                "type": "text"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{baseUrl}}/api/students/{{studentId}}/attendance/calendar?month={{month}}",
+                            "host": [
+                                "{{baseUrl}}/api/students/{{studentId}}/attendance/calendar?month={{month}}"
+                            ]
+                        }
+                    },
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "pm.test('Success status',()=>pm.expect(pm.response.code).to.be.below(500));"
+                                ]
+                            }
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "name": "Homework",
+            "item": [
+                {
+                    "name": "Homework List",
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{accessToken}}",
+                                "type": "text"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{baseUrl}}/api/students/{{studentId}}/homework",
+                            "host": [
+                                "{{baseUrl}}/api/students/{{studentId}}/homework"
+                            ]
+                        }
+                    },
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "pm.test('Success status',()=>pm.expect(pm.response.code).to.be.below(500));"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "name": "Homework Detail",
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{accessToken}}",
+                                "type": "text"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{baseUrl}}/api/homework/{{homeworkId}}",
+                            "host": [
+                                "{{baseUrl}}/api/homework/{{homeworkId}}"
+                            ]
+                        }
+                    },
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "pm.test('Success status',()=>pm.expect(pm.response.code).to.be.below(500));"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "name": "Homework Subjects",
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{accessToken}}",
+                                "type": "text"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{baseUrl}}/api/students/{{studentId}}/homework/subjects",
+                            "host": [
+                                "{{baseUrl}}/api/students/{{studentId}}/homework/subjects"
+                            ]
+                        }
+                    },
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "pm.test('Success status',()=>pm.expect(pm.response.code).to.be.below(500));"
+                                ]
+                            }
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "name": "Notices",
+            "item": [
+                {
+                    "name": "Notice List",
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{accessToken}}",
+                                "type": "text"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{baseUrl}}/api/students/{{studentId}}/notices",
+                            "host": [
+                                "{{baseUrl}}/api/students/{{studentId}}/notices"
+                            ]
+                        }
+                    },
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "pm.test('Success status',()=>pm.expect(pm.response.code).to.be.below(500));"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "name": "Notice Detail",
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{accessToken}}",
+                                "type": "text"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{baseUrl}}/api/notices/{{noticeId}}",
+                            "host": [
+                                "{{baseUrl}}/api/notices/{{noticeId}}"
+                            ]
+                        }
+                    },
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "pm.test('Success status',()=>pm.expect(pm.response.code).to.be.below(500));"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "name": "Mark Notice Read",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{accessToken}}",
+                                "type": "text"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{baseUrl}}/api/notices/{{noticeId}}/read",
+                            "host": [
+                                "{{baseUrl}}/api/notices/{{noticeId}}/read"
+                            ]
+                        }
+                    },
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "pm.test('Success status',()=>pm.expect(pm.response.code).to.be.below(500));"
+                                ]
+                            }
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "name": "Teachers",
+            "item": [
+                {
+                    "name": "Class Teachers",
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{accessToken}}",
+                                "type": "text"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{baseUrl}}/api/students/{{studentId}}/class-teachers",
+                            "host": [
+                                "{{baseUrl}}/api/students/{{studentId}}/class-teachers"
+                            ]
+                        }
+                    },
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "pm.test('Success status',()=>pm.expect(pm.response.code).to.be.below(500));"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "name": "Subject Teachers",
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{accessToken}}",
+                                "type": "text"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{baseUrl}}/api/students/{{studentId}}/subject-teachers",
+                            "host": [
+                                "{{baseUrl}}/api/students/{{studentId}}/subject-teachers"
+                            ]
+                        }
+                    },
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "pm.test('Success status',()=>pm.expect(pm.response.code).to.be.below(500));"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "name": "Teacher Profile",
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{accessToken}}",
+                                "type": "text"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{baseUrl}}/api/teachers/{{teacherId}}",
+                            "host": [
+                                "{{baseUrl}}/api/teachers/{{teacherId}}"
+                            ]
+                        }
+                    },
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "pm.test('Success status',()=>pm.expect(pm.response.code).to.be.below(500));"
+                                ]
+                            }
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "name": "Fees",
+            "item": [
+                {
+                    "name": "Fee Summary",
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{accessToken}}",
+                                "type": "text"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{baseUrl}}/api/students/{{studentId}}/fees/summary",
+                            "host": [
+                                "{{baseUrl}}/api/students/{{studentId}}/fees/summary"
+                            ]
+                        }
+                    },
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "pm.test('Success status',()=>pm.expect(pm.response.code).to.be.below(500));"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "name": "Fee Details",
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{accessToken}}",
+                                "type": "text"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{baseUrl}}/api/students/{{studentId}}/fees",
+                            "host": [
+                                "{{baseUrl}}/api/students/{{studentId}}/fees"
+                            ]
+                        }
+                    },
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "pm.test('Success status',()=>pm.expect(pm.response.code).to.be.below(500));"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "name": "Individual Fee",
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{accessToken}}",
+                                "type": "text"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{baseUrl}}/api/students/{{studentId}}/fees/{{feeId}}",
+                            "host": [
+                                "{{baseUrl}}/api/students/{{studentId}}/fees/{{feeId}}"
+                            ]
+                        }
+                    },
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "pm.test('Success status',()=>pm.expect(pm.response.code).to.be.below(500));"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "name": "Fee Account",
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{accessToken}}",
+                                "type": "text"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{baseUrl}}/api/students/{{studentId}}/fee-account",
+                            "host": [
+                                "{{baseUrl}}/api/students/{{studentId}}/fee-account"
+                            ]
+                        }
+                    },
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "pm.test('Success status',()=>pm.expect(pm.response.code).to.be.below(500));"
+                                ]
+                            }
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "name": "Payments",
+            "item": [
+                {
+                    "name": "Payment Status",
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{accessToken}}",
+                                "type": "text"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{baseUrl}}/api/payments/{{paymentId}}/status",
+                            "host": [
+                                "{{baseUrl}}/api/payments/{{paymentId}}/status"
+                            ]
+                        }
+                    },
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "pm.test('Success status',()=>pm.expect(pm.response.code).to.be.below(500));"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "name": "Payment History",
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{accessToken}}",
+                                "type": "text"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{baseUrl}}/api/students/{{studentId}}/payments",
+                            "host": [
+                                "{{baseUrl}}/api/students/{{studentId}}/payments"
+                            ]
+                        }
+                    },
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "pm.test('Success status',()=>pm.expect(pm.response.code).to.be.below(500));"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "name": "Create Order",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{accessToken}}",
+                                "type": "text"
+                            },
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json",
+                                "type": "text"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{baseUrl}}/api/payments/create-order",
+                            "host": [
+                                "{{baseUrl}}/api/payments/create-order"
+                            ]
+                        },
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n    \"studentId\": \"{{studentId}}\",\n    \"amount\": 3500,\n    \"reference\": \"April 2026\"\n}",
+                            "options": {
+                                "raw": {
+                                    "language": "json"
+                                }
+                            }
+                        }
+                    },
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "pm.test('Success status',()=>pm.expect(pm.response.code).to.be.below(500));"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "name": "Verify Payment",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{accessToken}}",
+                                "type": "text"
+                            },
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json",
+                                "type": "text"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{baseUrl}}/api/payments/verify",
+                            "host": [
+                                "{{baseUrl}}/api/payments/verify"
+                            ]
+                        },
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n    \"paymentId\": \"{{paymentId}}\",\n    \"providerPaymentId\": \"{{providerPaymentId}}\",\n    \"signature\": \"{{paymentSignature}}\"\n}",
+                            "options": {
+                                "raw": {
+                                    "language": "json"
+                                }
+                            }
+                        }
+                    },
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "pm.test('Success status',()=>pm.expect(pm.response.code).to.be.below(500));"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "name": "Payment Webhook",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json",
+                                "type": "text"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{baseUrl}}/api/payments/webhook",
+                            "host": [
+                                "{{baseUrl}}/api/payments/webhook"
+                            ]
+                        },
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n    \"schoolCode\": \"{{schoolCode}}\",\n    \"paymentId\": \"{{paymentId}}\",\n    \"providerPaymentId\": \"{{providerPaymentId}}\",\n    \"status\": \"paid\",\n    \"signature\": \"{{webhookSignature}}\"\n}",
+                            "options": {
+                                "raw": {
+                                    "language": "json"
+                                }
+                            }
+                        }
+                    },
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "pm.test('Success status',()=>pm.expect(pm.response.code).to.be.below(500));"
+                                ]
+                            }
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "name": "Receipts",
+            "item": [
+                {
+                    "name": "Receipt History",
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{accessToken}}",
+                                "type": "text"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{baseUrl}}/api/students/{{studentId}}/receipts",
+                            "host": [
+                                "{{baseUrl}}/api/students/{{studentId}}/receipts"
+                            ]
+                        }
+                    },
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "pm.test('Success status',()=>pm.expect(pm.response.code).to.be.below(500));"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "name": "Receipt Detail",
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{accessToken}}",
+                                "type": "text"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{baseUrl}}/api/receipts/{{receiptId}}",
+                            "host": [
+                                "{{baseUrl}}/api/receipts/{{receiptId}}"
+                            ]
+                        }
+                    },
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "pm.test('Success status',()=>pm.expect(pm.response.code).to.be.below(500));"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "name": "Download Receipt",
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{accessToken}}",
+                                "type": "text"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{baseUrl}}/api/receipts/{{receiptId}}/download",
+                            "host": [
+                                "{{baseUrl}}/api/receipts/{{receiptId}}/download"
+                            ]
+                        }
+                    },
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "pm.test('Success status',()=>pm.expect(pm.response.code).to.be.below(500));"
+                                ]
+                            }
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "name": "Notifications",
+            "item": [
+                {
+                    "name": "Notification List",
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{accessToken}}",
+                                "type": "text"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{baseUrl}}/api/notifications",
+                            "host": [
+                                "{{baseUrl}}/api/notifications"
+                            ]
+                        }
+                    },
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "pm.test('Success status',()=>pm.expect(pm.response.code).to.be.below(500));"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "name": "Unread Count",
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{accessToken}}",
+                                "type": "text"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{baseUrl}}/api/notifications/unread-count",
+                            "host": [
+                                "{{baseUrl}}/api/notifications/unread-count"
+                            ]
+                        }
+                    },
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "pm.test('Success status',()=>pm.expect(pm.response.code).to.be.below(500));"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "name": "Mark Notification Read",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{accessToken}}",
+                                "type": "text"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{baseUrl}}/api/notifications/{{notificationId}}/read",
+                            "host": [
+                                "{{baseUrl}}/api/notifications/{{notificationId}}/read"
+                            ]
+                        }
+                    },
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "pm.test('Success status',()=>pm.expect(pm.response.code).to.be.below(500));"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "name": "Mark All Read",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{accessToken}}",
+                                "type": "text"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{baseUrl}}/api/notifications/read-all",
+                            "host": [
+                                "{{baseUrl}}/api/notifications/read-all"
+                            ]
+                        }
+                    },
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "pm.test('Success status',()=>pm.expect(pm.response.code).to.be.below(500));"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "name": "Remove Device",
+                    "request": {
+                        "method": "DELETE",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{accessToken}}",
+                                "type": "text"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{baseUrl}}/api/devices/{{deviceId}}",
+                            "host": [
+                                "{{baseUrl}}/api/devices/{{deviceId}}"
+                            ]
+                        }
+                    },
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "pm.test('Success status',()=>pm.expect(pm.response.code).to.be.below(500));"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "name": "Register Device",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{accessToken}}",
+                                "type": "text"
+                            },
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json",
+                                "type": "text"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{baseUrl}}/api/devices/register",
+                            "host": [
+                                "{{baseUrl}}/api/devices/register"
+                            ]
+                        },
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n    \"deviceId\": \"android-device-key\",\n    \"fcmToken\": \"replace-me\",\n    \"platform\": \"android\",\n    \"appVersion\": \"1.0.0\"\n}",
+                            "options": {
+                                "raw": {
+                                    "language": "json"
+                                }
+                            }
+                        }
+                    },
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "pm.test('Success status',()=>pm.expect(pm.response.code).to.be.below(500));"
+                                ]
+                            }
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "name": "School & Settings",
+            "item": [
+                {
+                    "name": "School",
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{accessToken}}",
+                                "type": "text"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{baseUrl}}/api/school",
+                            "host": [
+                                "{{baseUrl}}/api/school"
+                            ]
+                        }
+                    },
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "pm.test('Success status',()=>pm.expect(pm.response.code).to.be.below(500));"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "name": "Academic Session",
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{accessToken}}",
+                                "type": "text"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{baseUrl}}/api/school/academic-session",
+                            "host": [
+                                "{{baseUrl}}/api/school/academic-session"
+                            ]
+                        }
+                    },
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "pm.test('Success status',()=>pm.expect(pm.response.code).to.be.below(500));"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "name": "App Config",
+                    "request": {
+                        "method": "GET",
+                        "header": [],
+                        "url": {
+                            "raw": "{{baseUrl}}/api/app/config",
+                            "host": [
+                                "{{baseUrl}}/api/app/config"
+                            ]
+                        }
+                    },
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "pm.test('Success status',()=>pm.expect(pm.response.code).to.be.below(500));"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "name": "Settings",
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{accessToken}}",
+                                "type": "text"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{baseUrl}}/api/settings",
+                            "host": [
+                                "{{baseUrl}}/api/settings"
+                            ]
+                        }
+                    },
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "pm.test('Success status',()=>pm.expect(pm.response.code).to.be.below(500));"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "name": "Update Settings",
+                    "request": {
+                        "method": "PUT",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{accessToken}}",
+                                "type": "text"
+                            },
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json",
+                                "type": "text"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{baseUrl}}/api/settings",
+                            "host": [
+                                "{{baseUrl}}/api/settings"
+                            ]
+                        },
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n    \"attendanceNotifications\": true,\n    \"feeNotifications\": true,\n    \"homeworkNotifications\": true,\n    \"noticeNotifications\": true,\n    \"language\": \"en\"\n}",
+                            "options": {
+                                "raw": {
+                                    "language": "json"
+                                }
+                            }
+                        }
+                    },
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "pm.test('Success status',()=>pm.expect(pm.response.code).to.be.below(500));"
+                                ]
+                            }
+                        }
+                    ]
+                }
+            ]
+        }
+    ]
+}

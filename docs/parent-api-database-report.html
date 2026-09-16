@@ -1,0 +1,163 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>ET Parent API – Database & Query Report</title>
+  <style>
+    :root{--navy:#092b52;--blue:#1769aa;--sky:#eaf4ff;--ink:#172033;--muted:#667085;--line:#d8e1ec;--green:#087443;--amber:#9a5a00;--red:#a12828}
+    *{box-sizing:border-box}body{margin:0;background:#f4f7fb;color:var(--ink);font:14px/1.52 "Segoe UI",Arial,sans-serif}.page{max-width:1240px;margin:28px auto;background:#fff;box-shadow:0 8px 28px #1633541c}.hero{padding:38px 44px;color:#fff;background:linear-gradient(135deg,var(--navy),#1263a4)}.hero h1{margin:0 0 7px;font-size:29px}.hero p{margin:0;opacity:.9}.content{padding:34px 44px 48px}h2{margin:34px 0 13px;color:var(--navy);font-size:21px;border-bottom:2px solid #dbeafa;padding-bottom:7px}h3{color:var(--navy);margin:24px 0 9px}.cards{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}.card{border:1px solid var(--line);border-radius:10px;padding:15px;background:#fbfdff}.card strong{display:block;font-size:24px;color:var(--blue)}.flow{background:var(--sky);border-left:5px solid var(--blue);padding:16px 20px;border-radius:7px;font-weight:600}.note,.warn{padding:13px 16px;border-radius:7px;margin:13px 0}.note{background:#edf9f3;border-left:4px solid var(--green)}.warn{background:#fff7e8;border-left:4px solid #dc8a00}.table-wrap{overflow:auto;border:1px solid var(--line);border-radius:8px}table{width:100%;border-collapse:collapse;min-width:760px}th{background:var(--navy);color:#fff;text-align:left;padding:10px;font-size:12px;letter-spacing:.02em}td{padding:9px 10px;border-bottom:1px solid var(--line);vertical-align:top}tr:last-child td{border-bottom:0}tbody tr:nth-child(even){background:#f8fafc}code{font-family:Consolas,monospace;background:#eef2f7;padding:2px 5px;border-radius:4px;color:#243b5a}.sql{white-space:pre-wrap;background:#101c2b;color:#d7eaff;border-radius:8px;padding:14px;overflow:auto;font:12px/1.5 Consolas,monospace}.tag{display:inline-block;padding:2px 7px;border-radius:20px;font-size:11px;font-weight:700}.new{background:#e7f7ef;color:var(--green)}.existing{background:#eaf2fb;color:#175c96}.auto{background:#fff0d5;color:var(--amber)}.method{font-family:Consolas,monospace;font-weight:700;color:var(--blue)}.footer{padding:18px 44px;background:#eef3f8;color:var(--muted);font-size:12px}@media(max-width:800px){.page{margin:0}.content,.hero{padding:25px 20px}.cards{grid-template-columns:1fr 1fr}}@media print{body{background:#fff}.page{box-shadow:none;margin:0;max-width:none}.hero{-webkit-print-color-adjust:exact;print-color-adjust:exact}.table-wrap{overflow:visible}table{min-width:0;font-size:10px}th{print-color-adjust:exact}.content{padding:20px}.no-print{display:none}h2{break-after:avoid}tr{break-inside:avoid}}
+  </style>
+</head>
+<body>
+<main class="page">
+  <header class="hero">
+    <h1>ET Parent API – Database & Query Report</h1>
+    <p>Parent App backend • SQL Server multi-school architecture • Generated from the implemented PHP source</p>
+  </header>
+  <section class="content">
+    <div class="cards">
+      <div class="card"><strong>42</strong>Parent API endpoints</div>
+      <div class="card"><strong>13</strong>New parent/app tables</div>
+      <div class="card"><strong>14</strong>Existing ERP/registry tables</div>
+      <div class="card"><strong>2</strong>Auto-created auth tables</div>
+    </div>
+
+    <h2>1. Database connection flow</h2>
+    <div class="flow">Request schoolCode → <code>admineyetab.dbo.SchoolConnection</code> → tenant ConnectionString → tenant SchoolManagement-style database → current <code>OwnerSession</code></div>
+    <p>The central registry chooses the tenant database. The tenant does not need an <code>ApiSchool</code> table. After tenant connection, parent/student/attendance/fee queries execute only in that selected tenant.</p>
+    <div class="note"><b>Academic session:</b> every session-dependent API automatically selects the row where today falls between <code>OwnerSession.StartDate</code> and <code>OwnerSession.EndDate</code>.</div>
+
+    <h2>2. New tables created for Parent App</h2>
+    <div class="table-wrap"><table>
+      <thead><tr><th>#</th><th>Table</th><th>Purpose</th><th>Main relationships / keys</th></tr></thead>
+      <tbody>
+        <tr><td>1</td><td><code>AppParent</code> <span class="tag new">NEW</span></td><td>Parent login/profile</td><td>PK AppParentID; SchoolBranchID → SchoolBranch; unique Branch + ParentCode</td></tr>
+        <tr><td>2</td><td><code>AppParentStudent</code> <span class="tag new">NEW</span></td><td>Parent-child linking and access control</td><td>AppParentID → AppParent; StudentID → Student; unique parent + student</td></tr>
+        <tr><td>3</td><td><code>AppParentAuthToken</code> <span class="tag new">NEW</span></td><td>Access/refresh tokens, expiry and logout</td><td>AppParentID → AppParent; unique access/refresh hashes</td></tr>
+        <tr><td>4</td><td><code>AppHomework</code> <span class="tag new">NEW</span></td><td>Class/section/subject homework</td><td>OwnerSession, Class, optional Section/Subject and teacher EmployeeID</td></tr>
+        <tr><td>5</td><td><code>AppClassTeacher</code> <span class="tag new">NEW</span></td><td>Class teacher/co-class teacher mapping</td><td>Session + class + section + SchoolTeacher.ApiUserID + role</td></tr>
+        <tr><td>6</td><td><code>AppNotice</code> <span class="tag new">NEW</span></td><td>Global/session/class/section/student notices</td><td>Nullable targeting fields allow broad or specific notices</td></tr>
+        <tr><td>7</td><td><code>AppNoticeRead</code> <span class="tag new">NEW</span></td><td>Per-parent notice read state</td><td>Composite PK AppParentID + AppNoticeID</td></tr>
+        <tr><td>8</td><td><code>AppNotification</code> <span class="tag new">NEW</span></td><td>Parent/student/global push notification feed</td><td>Optional AppParentID or StudentID</td></tr>
+        <tr><td>9</td><td><code>AppNotificationRead</code> <span class="tag new">NEW</span></td><td>Notification read state</td><td>Composite PK AppParentID + AppNotificationID</td></tr>
+        <tr><td>10</td><td><code>AppParentDevice</code> <span class="tag new">NEW</span></td><td>FCM token and device registration</td><td>Unique parent + device key</td></tr>
+        <tr><td>11</td><td><code>AppParentSetting</code> <span class="tag new">NEW</span></td><td>Notification and language preferences</td><td>One row per AppParentID</td></tr>
+        <tr><td>12</td><td><code>AppPayment</code> <span class="tag new">NEW</span></td><td>Payment order/status/provider references</td><td>AppParentID + StudentID; UUID payment key</td></tr>
+        <tr><td>13</td><td><code>AppReceipt</code> <span class="tag new">NEW</span></td><td>App payment receipt and protected PDF path</td><td>Optional AppPaymentID; StudentID → Student</td></tr>
+      </tbody>
+    </table></div>
+
+    <h2>3. Existing tables reused</h2>
+    <div class="table-wrap"><table>
+      <thead><tr><th>Database</th><th>Table</th><th>How it is used</th></tr></thead>
+      <tbody>
+        <tr><td>Central <code>admineyetab</code></td><td><code>SchoolConnection</code> <span class="tag existing">EXISTING</span></td><td>SchoolCode to encrypted/full SQL connection string routing</td></tr>
+        <tr><td>Tenant</td><td><code>SchoolBranch</code></td><td>School name, address, contact and branch information</td></tr>
+        <tr><td>Tenant</td><td><code>OwnerSession</code></td><td>Automatic current academic session</td></tr>
+        <tr><td>Tenant</td><td><code>Student</code></td><td>Student identity, parents, DOB, address and admission information</td></tr>
+        <tr><td>Tenant</td><td><code>StudentSession</code></td><td>Current class, section, roll number and active enrolment</td></tr>
+        <tr><td>Tenant</td><td><code>ClassMaster</code>, <code>SectionMaster</code></td><td>Class and section names</td></tr>
+        <tr><td>Tenant</td><td><code>AttItem</code></td><td>Attendance history/status from AttType and AttValue</td></tr>
+        <tr><td>Tenant</td><td><code>CBSEExamSubject</code></td><td>Homework and subject-teacher subject names</td></tr>
+        <tr><td>Tenant</td><td><code>SchoolTeacher</code></td><td>Teacher identity; ApiUserID may be UUID, int or bigint</td></tr>
+        <tr><td>Tenant</td><td><code>ApiTeacherAssignment</code></td><td>Subject-wise teacher assignment</td></tr>
+        <tr><td>Tenant</td><td><code>StudentFees</code>, <code>StudentFeesItem</code></td><td>Fee dues and fee-item breakup</td></tr>
+        <tr><td>Tenant</td><td><code>FeeReceipt</code></td><td>Existing ERP receipt/payment history</td></tr>
+      </tbody>
+    </table></div>
+    <div class="warn"><b>Runtime security support:</b> <code>ApiLoginAttempt</code> and <code>ApiAuthToken</code> are automatically created when missing. Their <code>ApiUserID</code> type is detected from <code>SchoolTeacher.ApiUserID</code>. The configured SQL login must have CREATE TABLE permission for this one-time bootstrap.</div>
+
+    <h2>4. Complete API → query/table mapping</h2>
+    <div class="table-wrap"><table>
+      <thead><tr><th>#</th><th>API</th><th>Operation</th><th>Tables used</th><th>Query logic</th></tr></thead>
+      <tbody>
+        <tr><td>1</td><td><span class="method">POST</span> /api/auth/login</td><td>SELECT, UPDATE, INSERT</td><td>SchoolConnection, AppParent, AppParentAuthToken, OwnerSession</td><td>Route school; find active ParentCode; verify/upgrade password; update LastLoginAt; issue hashed access/refresh tokens.</td></tr>
+        <tr><td>2</td><td><span class="method">POST</span> /api/auth/refresh-token</td><td>SELECT with locks, UPDATE, INSERT</td><td>AppParentAuthToken</td><td>Validate refresh hash and expiry, revoke old row, create rotated token pair in one transaction.</td></tr>
+        <tr><td>3</td><td><span class="method">POST</span> /api/auth/logout</td><td>UPDATE</td><td>AppParentAuthToken</td><td>Set RevokedAt for current access-token hash.</td></tr>
+        <tr><td>4</td><td><span class="method">GET</span> /api/parent/profile</td><td>Token SELECT</td><td>AppParentAuthToken, AppParent</td><td>Authenticated parent fields are returned from token lookup.</td></tr>
+        <tr><td>5</td><td><span class="method">GET</span> /api/parent/students</td><td>SELECT JOIN</td><td>AppParentStudent, Student, StudentSession, ClassMaster, SectionMaster</td><td>Return linked children enrolled in current session.</td></tr>
+        <tr><td>6</td><td><span class="method">GET</span> /api/students/{studentId}</td><td>SELECT</td><td>AppParentStudent, Student, StudentSession, ClassMaster, SectionMaster</td><td>Verify link, then return full student/profile/enrolment fields.</td></tr>
+        <tr><td>7</td><td><span class="method">GET</span> /api/students/{studentId}/dashboard</td><td>Multiple SELECTs</td><td>OwnerSession, AttItem, AppHomework, StudentSession, AppNotice, AppNotification, AppNotificationRead</td><td>Combined current session, today attendance, latest homework/notice and unread count.</td></tr>
+        <tr><td>8</td><td><span class="method">GET</span> /attendance/summary</td><td>Aggregate SELECT</td><td>AppParentStudent, StudentSession, AttItem</td><td>COUNT/SUM P, A and H/2; calculate attendance percentage.</td></tr>
+        <tr><td>9</td><td><span class="method">GET</span> /attendance</td><td>SELECT</td><td>AppParentStudent, StudentSession, AttItem</td><td>Date-range attendance history ordered latest first.</td></tr>
+        <tr><td>10</td><td><span class="method">GET</span> /attendance/calendar</td><td>SELECT</td><td>AppParentStudent, StudentSession, AttItem</td><td>Selected YYYY-MM date range with day/status.</td></tr>
+        <tr><td>11</td><td><span class="method">GET</span> /students/{id}/homework</td><td>SELECT JOIN</td><td>AppHomework, CBSEExamSubject, StudentSession</td><td>Current session/class/section homework; optional subject filter.</td></tr>
+        <tr><td>12</td><td><span class="method">GET</span> /api/homework/{homeworkId}</td><td>SELECT + EXISTS</td><td>AppHomework, CBSEExamSubject, SchoolTeacher, AppParentStudent, StudentSession</td><td>Return detail only if one linked child is eligible.</td></tr>
+        <tr><td>13</td><td><span class="method">GET</span> /homework/subjects</td><td>DISTINCT SELECT</td><td>AppHomework, CBSEExamSubject</td><td>Subjects having active homework for child class/section/session.</td></tr>
+        <tr><td>14</td><td><span class="method">GET</span> /students/{id}/notices</td><td>SELECT, LEFT JOIN</td><td>AppNotice, AppNoticeRead</td><td>Match global/session/class/section/student targets and add isRead.</td></tr>
+        <tr><td>15</td><td><span class="method">GET</span> /api/notices/{noticeId}</td><td>SELECT + EXISTS</td><td>AppNotice, AppParentStudent, StudentSession</td><td>Protected notice detail based on linked-child eligibility.</td></tr>
+        <tr><td>16</td><td><span class="method">POST</span> /notices/{id}/read</td><td>SELECT, conditional INSERT</td><td>AppNotice, AppNoticeRead</td><td>Validate access and insert read row only when absent.</td></tr>
+        <tr><td>17</td><td><span class="method">GET</span> /class-teachers</td><td>SELECT JOIN</td><td>AppClassTeacher, SchoolTeacher</td><td>Current session/class/section class and co-class teachers.</td></tr>
+        <tr><td>18</td><td><span class="method">GET</span> /subject-teachers</td><td>SELECT JOIN</td><td>ApiTeacherAssignment, SchoolTeacher, CBSEExamSubject</td><td>Current class/section subject assignment list.</td></tr>
+        <tr><td>19</td><td><span class="method">GET</span> /api/teachers/{teacherId}</td><td>SELECT + EXISTS</td><td>SchoolTeacher, ApiTeacherAssignment, AppClassTeacher, AppParentStudent, StudentSession</td><td>Accept numeric or UUID ApiUserID and enforce parent visibility.</td></tr>
+        <tr><td>20</td><td><span class="method">GET</span> /fees/summary</td><td>SELECT + PHP aggregation</td><td>StudentFees, FeeReceipt, AppReceipt</td><td>Compute due, discount, paid and balance using available legacy amount columns.</td></tr>
+        <tr><td>21</td><td><span class="method">GET</span> /students/{id}/fees</td><td>SELECT</td><td>StudentFees</td><td>All fee rows for linked student.</td></tr>
+        <tr><td>22</td><td><span class="method">GET</span> /fees/{feeId}</td><td>SELECT</td><td>StudentFees, StudentFeesItem</td><td>Fee header plus ordered item breakup.</td></tr>
+        <tr><td>23</td><td><span class="method">GET</span> /fee-account</td><td>Multiple SELECTs</td><td>StudentFees, FeeReceipt, AppReceipt</td><td>Combined dues and legacy/app receipts.</td></tr>
+        <tr><td>24</td><td><span class="method">POST</span> /payments/create-order</td><td>INSERT</td><td>AppPayment</td><td>Validate linked child/amount and create local gateway order record.</td></tr>
+        <tr><td>25</td><td><span class="method">POST</span> /payments/verify</td><td>UPDATE</td><td>AppPayment</td><td>Validate HMAC signature and mark owned payment paid.</td></tr>
+        <tr><td>26</td><td><span class="method">POST</span> /payments/webhook</td><td>UPDATE</td><td>SchoolConnection, AppPayment</td><td>Route school, validate webhook signature/status, update payment.</td></tr>
+        <tr><td>27</td><td><span class="method">GET</span> /payments/{paymentId}/status</td><td>SELECT</td><td>AppPayment</td><td>Return only payment owned by authenticated parent.</td></tr>
+        <tr><td>28</td><td><span class="method">GET</span> /students/{id}/payments</td><td>SELECT</td><td>AppPayment</td><td>Parent-owned payment history for linked student.</td></tr>
+        <tr><td>29</td><td><span class="method">GET</span> /students/{id}/receipts</td><td>Two SELECTs</td><td>FeeReceipt, AppReceipt</td><td>Merge existing ERP and app-generated receipts.</td></tr>
+        <tr><td>30</td><td><span class="method">GET</span> /receipts/{receiptId}</td><td>SELECT with fallback</td><td>AppReceipt, FeeReceipt, AppParentStudent</td><td>Try app receipt first, then legacy receipt; enforce child ownership.</td></tr>
+        <tr><td>31</td><td><span class="method">GET</span> /receipts/{id}/download</td><td>SELECT + file read</td><td>AppReceipt, AppParentStudent</td><td>Authorize receipt and stream PDF only from storage/receipts.</td></tr>
+        <tr><td>32</td><td><span class="method">GET</span> /api/notifications</td><td>SELECT, LEFT JOIN</td><td>AppNotification, AppNotificationRead, AppParentStudent</td><td>Parent, child and global notifications with read state.</td></tr>
+        <tr><td>33</td><td><span class="method">GET</span> /notifications/unread-count</td><td>COUNT + NOT EXISTS</td><td>AppNotification, AppNotificationRead, AppParentStudent</td><td>Unread badge count.</td></tr>
+        <tr><td>34</td><td><span class="method">POST</span> /notifications/{id}/read</td><td>SELECT, conditional INSERT</td><td>AppNotification, AppNotificationRead</td><td>Validate visibility and mark one notification read.</td></tr>
+        <tr><td>35</td><td><span class="method">POST</span> /notifications/read-all</td><td>INSERT SELECT</td><td>AppNotification, AppNotificationRead, AppParentStudent</td><td>Insert every visible unread notification in one statement.</td></tr>
+        <tr><td>36</td><td><span class="method">POST</span> /devices/register</td><td>UPDATE or INSERT</td><td>AppParentDevice</td><td>Upsert FCM token by parent + device key.</td></tr>
+        <tr><td>37</td><td><span class="method">DELETE</span> /devices/{deviceId}</td><td>UPDATE</td><td>AppParentDevice</td><td>Soft-remove by setting IsActive=0.</td></tr>
+        <tr><td>38</td><td><span class="method">GET</span> /api/school</td><td>SELECT</td><td>SchoolBranch</td><td>Return branch contact/profile fields.</td></tr>
+        <tr><td>39</td><td><span class="method">GET</span> /school/academic-session</td><td>SELECT</td><td>OwnerSession</td><td>Current date between StartDate and EndDate.</td></tr>
+        <tr><td>40</td><td><span class="method">GET</span> /api/app/config</td><td>No tenant query</td><td>Environment configuration</td><td>Version, maintenance and payment-enabled flags.</td></tr>
+        <tr><td>41</td><td><span class="method">GET</span> /api/settings</td><td>Conditional INSERT, SELECT</td><td>AppParentSetting</td><td>Create defaults if absent and return preferences.</td></tr>
+        <tr><td>42</td><td><span class="method">PUT</span> /api/settings</td><td>SELECT, UPDATE</td><td>AppParentSetting</td><td>Merge provided preferences and update timestamp.</td></tr>
+      </tbody>
+    </table></div>
+
+    <h2>5. Important SQL patterns</h2>
+    <h3>Current session</h3>
+    <pre class="sql">SELECT TOP 1 OwnerSessionID, SessionName, StartDate, EndDate
+FROM OwnerSession
+WHERE CAST(GETDATE() AS date)
+      BETWEEN CAST(StartDate AS date) AND CAST(EndDate AS date)
+ORDER BY StartDate DESC, OwnerSessionID DESC;</pre>
+    <h3>Parent-child authorization</h3>
+    <pre class="sql">SELECT TOP 1 ss.ClassID, ss.SectionID, ss.OwnerSessionID
+FROM AppParentStudent link
+JOIN StudentSession ss ON ss.StudentID = link.StudentID
+WHERE link.AppParentID = @ParentID
+  AND link.StudentID = @StudentID
+  AND ss.OwnerSessionID = @CurrentSessionID
+  AND ss.IsLeave = 0;</pre>
+    <h3>Attendance summary</h3>
+    <pre class="sql">SELECT COUNT(*) total,
+       SUM(CASE WHEN AttType='P' THEN 1 ELSE 0 END) present,
+       SUM(CASE WHEN AttType='A' THEN 1 ELSE 0 END) absent,
+       SUM(CASE WHEN AttType='H/2' THEN 1 ELSE 0 END) halfDay
+FROM AttItem
+WHERE StudentID=@StudentID
+  AND CAST(Dated AS date) BETWEEN @From AND @To;</pre>
+    <h3>Idempotent read-state/device writes</h3>
+    <pre class="sql">IF NOT EXISTS (...)
+    INSERT ...;
+
+UPDATE AppParentDevice WITH (UPDLOCK,HOLDLOCK) ...;
+IF @@ROWCOUNT=0 INSERT INTO AppParentDevice ...;</pre>
+
+    <h2>6. Operational notes</h2>
+    <ul>
+      <li>All protected student endpoints first call the common parent-child authorization query.</li>
+      <li>Passwords may be legacy plain text once; successful login upgrades them to a secure PHP password hash.</li>
+      <li>Only token hashes are stored; raw bearer and refresh tokens are not saved.</li>
+      <li>Fee totals depend on the actual legacy column names present in each tenant. The implementation checks common aliases such as NetFee, Amount, FeeAmount, Discount and ReceiveAmount.</li>
+      <li>Payment rows are implemented, but real money collection still needs a selected gateway adapter and credentials.</li>
+      <li>New parent tables are defined in <code>database/004_parent_app.sql</code>. Runtime auto-bootstrap currently covers only the two teacher authentication support tables.</li>
+    </ul>
+  </section>
+  <footer class="footer">Source: ET Teacher/Parent PHP API workspace • Report date: 15 September 2026</footer>
+</main>
+</body>
+</html>

@@ -67,9 +67,7 @@ WHERE AttemptKey=@AttemptKey
 SELECT u.ApiUserID,u.PasswordHash,u.DisplayName,u.Username,u.Role,
        u.EmployeeID,u.SchoolBranchID
 FROM dbo.SchoolTeacher u
-JOIN dbo.ApiSchool s ON s.SchoolBranchID=u.SchoolBranchID
-WHERE s.SchoolCode=@SchoolCode
-  AND LOWER(u.Username)=@Username
+WHERE LOWER(u.Username)=@Username
   AND u.IsActive=1;
 ```
 
@@ -463,7 +461,7 @@ Status values: `P=1`, `A=0`, `H/2=0.5`, `Holiday=1`.
 
 | Feature | SQL tables |
 |---|---|
-| Schools/users | `ApiSchool`, `SchoolTeacher` |
+| School routing/users | `admineyetab.dbo.SchoolConnection`, tenant `SchoolTeacher` |
 | Login/tokens | `ApiLoginAttempt`, `ApiAuthToken` |
 | Teacher access | `ApiTeacherAssignment` |
 | Academic session | `OwnerSession` |

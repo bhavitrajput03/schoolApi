@@ -1,16 +1,5 @@
 -- Run this script while connected to the target application database.
 -- Example: sqlcmd -d SchoolManagement -i 001_api_security.sql
-IF OBJECT_ID('dbo.ApiSchool','U') IS NULL
-CREATE TABLE dbo.ApiSchool(
- SchoolBranchID bigint NOT NULL PRIMARY KEY,SchoolCode varchar(50) NOT NULL UNIQUE,
- IsActive bit NOT NULL CONSTRAINT DF_ApiSchool_Active DEFAULT 1,
- CONSTRAINT FK_ApiSchool_Branch FOREIGN KEY(SchoolBranchID) REFERENCES dbo.SchoolBranch(SchoolBranchID));
-GO
-MERGE dbo.ApiSchool AS t USING(
- SELECT SchoolBranchID,UPPER(COALESCE(NULLIF(Prefix,''),CONVERT(varchar(50),SchoolBranchID))) SchoolCode FROM dbo.SchoolBranch
-)s ON t.SchoolBranchID=s.SchoolBranchID
-WHEN NOT MATCHED THEN INSERT(SchoolBranchID,SchoolCode)VALUES(s.SchoolBranchID,s.SchoolCode);
-GO
 IF OBJECT_ID('dbo.SchoolTeacher','U') IS NULL
 CREATE TABLE dbo.SchoolTeacher(
  ApiUserID uniqueidentifier NOT NULL CONSTRAINT DF_ApiUser_ID DEFAULT NEWSEQUENTIALID() PRIMARY KEY,
@@ -19,7 +8,7 @@ CREATE TABLE dbo.SchoolTeacher(
  IsActive bit NOT NULL CONSTRAINT DF_ApiUser_Active DEFAULT 1,CreatedAt datetime2 NOT NULL CONSTRAINT DF_ApiUser_Created DEFAULT SYSUTCDATETIME(),
  PasswordChangedAt datetime2 NULL,LastLoginAt datetime2 NULL,CONSTRAINT UQ_ApiUser_Login UNIQUE(SchoolBranchID,Username),
  CONSTRAINT FK_ApiUser_Employee FOREIGN KEY(EmployeeID) REFERENCES dbo.Employee(EmployeeID),
- CONSTRAINT FK_ApiUser_School FOREIGN KEY(SchoolBranchID) REFERENCES dbo.ApiSchool(SchoolBranchID));
+ CONSTRAINT FK_ApiUser_School FOREIGN KEY(SchoolBranchID) REFERENCES dbo.SchoolBranch(SchoolBranchID));
 GO
 IF OBJECT_ID('dbo.ApiAuthToken','U') IS NULL
 CREATE TABLE dbo.ApiAuthToken(

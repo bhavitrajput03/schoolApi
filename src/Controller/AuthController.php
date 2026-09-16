@@ -9,7 +9,7 @@ final class AuthController {
         try{Database::useSchoolCode($school);}catch(\DomainException){Response::error('Invalid school code, username or password.',401,'INVALID_CREDENTIALS');}
         $key=hash('sha256',"$school|$username|".$r->ip());$db=Database::connection();$st=$db->prepare('SELECT COUNT(*) FROM ApiLoginAttempt WHERE AttemptKey=? AND AttemptedAt>DATEADD(MINUTE,-15,SYSUTCDATETIME())');$st->execute([$key]);
         if((int)$st->fetchColumn()>=5)Response::error('Too many login attempts. Try again after 15 minutes.',429,'RATE_LIMITED');
-        $st=$db->prepare('SELECT u.ApiUserID,u.PasswordHash,u.DisplayName,u.Username,u.Role,u.EmployeeID,u.SchoolBranchID FROM SchoolTeacher u JOIN ApiSchool s ON s.SchoolBranchID=u.SchoolBranchID WHERE s.SchoolCode=? AND LOWER(u.Username)=? AND u.IsActive=1');$st->execute([$school,$username]);$user=$st->fetch();
+        $st=$db->prepare('SELECT u.ApiUserID,u.PasswordHash,u.DisplayName,u.Username,u.Role,u.EmployeeID,u.SchoolBranchID FROM SchoolTeacher u WHERE LOWER(u.Username)=? AND u.IsActive=1');$st->execute([$username]);$user=$st->fetch();
         $plainPassword=(string)$d['password'];$storedPassword=(string)($user['PasswordHash']??'');
         if(!$user||!self::passwordMatches($plainPassword,$storedPassword)){$db->prepare('INSERT INTO ApiLoginAttempt(AttemptKey,AttemptedAt) VALUES(?,SYSUTCDATETIME())')->execute([$key]);Response::error('Invalid school code, username or password.',401,'INVALID_CREDENTIALS');}
         $passwordInfo=password_get_info($storedPassword);$algorithm=defined('PASSWORD_ARGON2ID')?PASSWORD_ARGON2ID:PASSWORD_DEFAULT;

@@ -27,7 +27,7 @@ final class SchoolService {
     public static function currentSessionId(): int {
         return self::currentSession()['id'];
     }
-    public static function assertAssignment(string $userId,int $classId,int $sectionId,?int $subjectId=null): void {
+    public static function assertAssignment(string|int $userId,int $classId,int $sectionId,?int $subjectId=null): void {
         $sql='SELECT COUNT(*) FROM ApiTeacherAssignment WHERE ApiUserID=? AND ClassID=? AND SectionID=? AND OwnerSessionID=? AND IsActive=1';
         $p=[$userId,$classId,$sectionId,self::currentSessionId()];if($subjectId!==null){$sql.=' AND SubjectID=?';$p[]=$subjectId;}
         $st=Database::connection()->prepare($sql);$st->execute($p);if(!(int)$st->fetchColumn())Response::error('You are not assigned to this class/section/subject.',403,'FORBIDDEN');

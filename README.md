@@ -20,6 +20,10 @@ Secure PHP 8 multi-school API. A central SQL Server database named `admineyetab`
 
 8. Enable Apache mod_rewrite and test POST http://localhost/school/public/api/auth/login.
 
+## Parent API
+
+Run `database/004_parent_app.sql` in each tenant database, verify it with `database/005_parent_legacy_preflight.sql`, then create/link a parent with `bin/create-parent.php` and `bin/link-parent-student.php`. Class teachers can be mapped with `bin/assign-class-teacher.php`. The same `/api/auth/login` endpoint automatically selects teacher login for a `username` body and parent login for a `parentCode`/`userId` body. All 42 parent routes and deployment notes are documented in `docs/parent-api.md`; an importable collection is in `postman/ET-Parent-API.postman_collection.json`.
+
 All request examples are in docs/curl-examples.md.
 
 ## Security

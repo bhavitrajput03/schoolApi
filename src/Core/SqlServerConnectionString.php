@@ -35,10 +35,22 @@ final class SqlServerConnectionString
         $parts = [];
         $buffer = '';
         $braced = false;
-        foreach (str_split(trim($input)) as $character) {
-            if ($character === '{') $braced = true;
-            if ($character === '}') $braced = false;
-            if ($character === ';' && !$braced) {
+        $quoted = false;
+        $characters = str_split(trim($input));
+        for ($index = 0, $count = count($characters); $index < $count; $index++) {
+            $character = $characters[$index];
+            if ($character === '"' && !$braced) {
+                // A doubled quote inside a quoted ODBC value represents one quote.
+                if ($quoted && ($characters[$index + 1] ?? null) === '"') {
+                    $buffer .= '""';
+                    $index++;
+                    continue;
+                }
+                $quoted = !$quoted;
+            }
+            if ($character === '{' && !$quoted) $braced = true;
+            if ($character === '}' && !$quoted) $braced = false;
+            if ($character === ';' && !$braced && !$quoted) {
                 if (trim($buffer) !== '') $parts[] = $buffer;
                 $buffer = '';
                 continue;
@@ -57,6 +69,8 @@ final class SqlServerConnectionString
             $value = trim($pair[1]);
             if (str_starts_with($value, '{') && str_ends_with($value, '}')) {
                 $value = substr($value, 1, -1);
+            } elseif (str_starts_with($value, '"') && str_ends_with($value, '"')) {
+                $value = str_replace('""', '"', substr($value, 1, -1));
             }
             $values[$key] = $value;
         }
