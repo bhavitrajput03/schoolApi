@@ -18,7 +18,7 @@ IF OBJECT_ID(N'dbo.SchoolTeacher',N'U') IS NULL
 IF OBJECT_ID(N'dbo.AppSubjectMaxMark',N'U') IS NULL
 BEGIN
     CREATE TABLE dbo.AppSubjectMaxMark(
-        AppSubjectMaxMarkID bigint IDENTITY(1,1) NOT NULL
+        AppSubjectMaxMarkID int IDENTITY(1,1) NOT NULL
             CONSTRAINT PK_AppSubjectMaxMark PRIMARY KEY,
         OwnerSessionID bigint NOT NULL,
         ClassID bigint NOT NULL,

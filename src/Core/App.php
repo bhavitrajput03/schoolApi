@@ -1,7 +1,7 @@
 <?php
 declare(strict_types=1);
 namespace App\Core;
-use App\Controller\{AttendanceController,AuthController,AuthGatewayController,ExamController,FeeController,HomeworkController,MarksController,NoticeController,NotificationController,ParentAppController,ParentAttendanceController,ParentAuthController,ParentController,ParentTeacherController,PaymentController,TeacherController};
+use App\Controller\{AttendanceController,AuthController,AuthGatewayController,ChatController,ExamController,FeeController,HomeworkController,MarksController,NoticeController,NotificationController,ParentAppController,ParentAttendanceController,ParentAuthController,ParentController,ParentTeacherController,PaymentController,TeacherContentController,TeacherController};
 final class App {
     public static function run(): void {
         self::headers();$r=new Request();
@@ -26,6 +26,8 @@ final class App {
             ['POST','#^/api/marks/student-wise$#',[MarksController::class,'saveStudentWise'],true],
             ['GET','#^/api/attendance/students$#',[AttendanceController::class,'students'],true],
             ['POST','#^/api/attendance$#',[AttendanceController::class,'save'],true],
+            ['POST','#^/api/teacher/notices$#',[TeacherContentController::class,'createNotice'],true],
+            ['POST','#^/api/teacher/homework$#',[TeacherContentController::class,'createHomework'],true],
 
             ['GET','#^/api/parent/profile$#',[ParentController::class,'profile'],'parent'],
             ['GET','#^/api/parent/students$#',[ParentController::class,'students'],'parent'],
@@ -43,14 +45,20 @@ final class App {
             ['GET','#^/api/students/(\d+)/class-teachers$#',[ParentTeacherController::class,'classTeachers'],'parent'],
             ['GET','#^/api/students/(\d+)/subject-teachers$#',[ParentTeacherController::class,'subjectTeachers'],'parent'],
             ['GET','#^/api/teachers/(\d+|[0-9a-fA-F-]{36})$#',[ParentTeacherController::class,'teacher'],'parent'],
+            ['GET','#^/api/chat/contacts$#',[ChatController::class,'contacts'],'parent'],
+            ['GET','#^/api/chat/conversations/(\d+)$#',[ChatController::class,'history'],'parent'],
+            ['POST','#^/api/chat/messages$#',[ChatController::class,'send'],'parent'],
+            ['POST','#^/api/chat/attachments$#',[ChatController::class,'attachment'],'parent'],
+            ['POST','#^/api/chat/conversations/(\d+)/read$#',[ChatController::class,'read'],'parent'],
             ['GET','#^/api/students/(\d+)/fees/summary$#',[FeeController::class,'summary'],'parent'],
             ['GET','#^/api/students/(\d+)/fees$#',[FeeController::class,'list'],'parent'],
             ['GET','#^/api/students/(\d+)/fees/(\d+)$#',[FeeController::class,'detail'],'parent'],
             ['GET','#^/api/students/(\d+)/fee-account$#',[FeeController::class,'account'],'parent'],
+            ['GET','#^/api/students/(\d+)/fee-account/download$#',[FeeController::class,'accountDownload'],'parent'],
             ['POST','#^/api/payments/create-order$#',[PaymentController::class,'create'],'parent'],
             ['POST','#^/api/payments/verify$#',[PaymentController::class,'verify'],'parent'],
             ['POST','#^/api/payments/webhook$#',[PaymentController::class,'webhook'],false],
-            ['GET','#^/api/payments/([0-9a-fA-F-]{36})/status$#',[PaymentController::class,'status'],'parent'],
+            ['GET','#^/api/payments/(\d+)/status$#',[PaymentController::class,'status'],'parent'],
             ['GET','#^/api/students/(\d+)/payments$#',[FeeController::class,'payments'],'parent'],
             ['GET','#^/api/students/(\d+)/receipts$#',[FeeController::class,'receipts'],'parent'],
             ['GET','#^/api/receipts/(\d+)$#',[FeeController::class,'receipt'],'parent'],

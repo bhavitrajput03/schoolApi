@@ -27,7 +27,7 @@
                         },
                         "body": {
                             "mode": "raw",
-                            "raw": "{\n    \"schoolCode\": \"{{schoolCode}}\",\n    \"parentCode\": \"{{parentCode}}\",\n    \"password\": \"{{password}}\"\n}",
+                            "raw": "{\n    \"schoolCode\": \"{{schoolCode}}\",\n    \"parentCode\": \"{{parentCode}}\",\n    \"password\": \"{{password}}\",\n    \"fcmToken\": \"{{fcmToken}}\",\n    \"deviceId\": \"{{loginDeviceId}}\",\n    \"platform\": \"android\",\n    \"appVersion\": \"1.0.0\"\n}",
                             "options": {
                                 "raw": {
                                     "language": "json"
@@ -766,6 +766,36 @@
                             }
                         }
                     ]
+                },
+                {
+                    "name": "Download Fee Account PDF",
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{accessToken}}",
+                                "type": "text"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{baseUrl}}/api/students/{{studentId}}/fee-account/download",
+                            "host": [
+                                "{{baseUrl}}/api/students/{{studentId}}/fee-account/download"
+                            ]
+                        }
+                    },
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "pm.test('Success status',()=>pm.expect(pm.response.code).to.be.below(500));"
+                                ]
+                            }
+                        }
+                    ]
                 }
             ]
         },
@@ -1397,6 +1427,203 @@
                         "body": {
                             "mode": "raw",
                             "raw": "{\n    \"attendanceNotifications\": true,\n    \"feeNotifications\": true,\n    \"homeworkNotifications\": true,\n    \"noticeNotifications\": true,\n    \"language\": \"en\"\n}",
+                            "options": {
+                                "raw": {
+                                    "language": "json"
+                                }
+                            }
+                        }
+                    },
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "pm.test('Success status',()=>pm.expect(pm.response.code).to.be.below(500));"
+                                ]
+                            }
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "name": "Chat",
+            "item": [
+                {
+                    "name": "Chat Contacts",
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{accessToken}}",
+                                "type": "text"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{baseUrl}}/api/chat/contacts?studentId={{studentId}}",
+                            "host": [
+                                "{{baseUrl}}/api/chat/contacts?studentId={{studentId}}"
+                            ]
+                        }
+                    },
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "pm.test('Success status',()=>pm.expect(pm.response.code).to.be.below(500));"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "name": "Chat History",
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{accessToken}}",
+                                "type": "text"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{baseUrl}}/api/chat/conversations/{{conversationId}}",
+                            "host": [
+                                "{{baseUrl}}/api/chat/conversations/{{conversationId}}"
+                            ]
+                        }
+                    },
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "pm.test('Success status',()=>pm.expect(pm.response.code).to.be.below(500));"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "name": "Send Message",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{accessToken}}",
+                                "type": "text"
+                            },
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json",
+                                "type": "text"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{baseUrl}}/api/chat/messages",
+                            "host": [
+                                "{{baseUrl}}/api/chat/messages"
+                            ]
+                        },
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n    \"studentId\": \"{{studentId}}\",\n    \"teacherId\": \"{{teacherId}}\",\n    \"message\": \"Hello teacher\"\n}",
+                            "options": {
+                                "raw": {
+                                    "language": "json"
+                                }
+                            }
+                        }
+                    },
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "pm.test('Success status',()=>pm.expect(pm.response.code).to.be.below(500));"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "name": "Send Attachment",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{accessToken}}",
+                                "type": "text"
+                            },
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json",
+                                "type": "text"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{baseUrl}}/api/chat/attachments",
+                            "host": [
+                                "{{baseUrl}}/api/chat/attachments"
+                            ]
+                        },
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n    \"studentId\": \"{{studentId}}\",\n    \"teacherId\": \"{{teacherId}}\",\n    \"message\": \"Please check\",\n    \"fileName\": \"homework.pdf\",\n    \"mimeType\": \"application/pdf\",\n    \"fileUrl\": \"https://example.com/homework.pdf\",\n    \"fileSize\": 12345\n}",
+                            "options": {
+                                "raw": {
+                                    "language": "json"
+                                }
+                            }
+                        }
+                    },
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "pm.test('Success status',()=>pm.expect(pm.response.code).to.be.below(500));"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "name": "Mark Conversation Read",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{accessToken}}",
+                                "type": "text"
+                            },
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json",
+                                "type": "text"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{baseUrl}}/api/chat/conversations/{{conversationId}}/read",
+                            "host": [
+                                "{{baseUrl}}/api/chat/conversations/{{conversationId}}/read"
+                            ]
+                        },
+                        "body": {
+                            "mode": "raw",
+                            "raw": "[]",
                             "options": {
                                 "raw": {
                                     "language": "json"

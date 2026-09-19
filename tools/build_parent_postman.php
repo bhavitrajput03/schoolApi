@@ -9,7 +9,7 @@ $item=function(string $name,string $method,string $url,?array $body=null,bool $p
     return['name'=>$name,'request'=>$request,'event'=>[['listen'=>'test','script'=>['type'=>'text/javascript','exec'=>$scripts]]]];
 };
 $folders=[];$add=function(string $folder,array $request)use(&$folders):void{if(!isset($folders[$folder]))$folders[$folder]=[];$folders[$folder][]=$request;};
-$add('Authentication',$item('Parent Login','POST',"$base/api/auth/login",['schoolCode'=>'{{schoolCode}}','parentCode'=>'{{parentCode}}','password'=>'{{password}}'],false,["let j=pm.response.json(); if(j.success){pm.environment.set('accessToken',j.data.auth.accessToken);pm.environment.set('refreshToken',j.data.auth.refreshToken);}"]));
+$add('Authentication',$item('Parent Login','POST',"$base/api/auth/login",['schoolCode'=>'{{schoolCode}}','parentCode'=>'{{parentCode}}','password'=>'{{password}}','fcmToken'=>'{{fcmToken}}','deviceId'=>'{{loginDeviceId}}','platform'=>'android','appVersion'=>'1.0.0'],false,["let j=pm.response.json(); if(j.success){pm.environment.set('accessToken',j.data.auth.accessToken);pm.environment.set('refreshToken',j.data.auth.refreshToken);}"]));
 $add('Authentication',$item('Refresh Token','POST',"$base/api/auth/refresh-token",['refreshToken'=>'{{refreshToken}}'],false,["let j=pm.response.json(); if(j.success){pm.environment.set('accessToken',j.data.auth.accessToken);pm.environment.set('refreshToken',j.data.auth.refreshToken);}"]));
 $add('Authentication',$item('Logout','POST',"$base/api/auth/logout",[]));
 $defs=[
@@ -20,11 +20,17 @@ $defs=[
 ['Notices','Notice List','GET','/api/students/{{studentId}}/notices'],['Notices','Notice Detail','GET','/api/notices/{{noticeId}}'],['Notices','Mark Notice Read','POST','/api/notices/{{noticeId}}/read'],
 ['Teachers','Class Teachers','GET','/api/students/{{studentId}}/class-teachers'],['Teachers','Subject Teachers','GET','/api/students/{{studentId}}/subject-teachers'],['Teachers','Teacher Profile','GET','/api/teachers/{{teacherId}}'],
 ['Fees','Fee Summary','GET','/api/students/{{studentId}}/fees/summary'],['Fees','Fee Details','GET','/api/students/{{studentId}}/fees'],['Fees','Individual Fee','GET','/api/students/{{studentId}}/fees/{{feeId}}'],['Fees','Fee Account','GET','/api/students/{{studentId}}/fee-account'],
+['Fees','Download Fee Account PDF','GET','/api/students/{{studentId}}/fee-account/download'],
 ['Payments','Payment Status','GET','/api/payments/{{paymentId}}/status'],['Payments','Payment History','GET','/api/students/{{studentId}}/payments'],
 ['Receipts','Receipt History','GET','/api/students/{{studentId}}/receipts'],['Receipts','Receipt Detail','GET','/api/receipts/{{receiptId}}'],['Receipts','Download Receipt','GET','/api/receipts/{{receiptId}}/download'],
 ['Notifications','Notification List','GET','/api/notifications'],['Notifications','Unread Count','GET','/api/notifications/unread-count'],['Notifications','Mark Notification Read','POST','/api/notifications/{{notificationId}}/read'],['Notifications','Mark All Read','POST','/api/notifications/read-all'],['Notifications','Remove Device','DELETE','/api/devices/{{deviceId}}'],
 ['School & Settings','School','GET','/api/school'],['School & Settings','Academic Session','GET','/api/school/academic-session'],['School & Settings','App Config','GET','/api/app/config',false],['School & Settings','Settings','GET','/api/settings']];
 foreach($defs as $d){$protected=$d[4]??true;$add($d[0],$item($d[1],$d[2],$base.$d[3],null,$protected));}
+$add('Chat',$item('Chat Contacts','GET',"$base/api/chat/contacts?studentId={{studentId}}"));
+$add('Chat',$item('Chat History','GET',"$base/api/chat/conversations/{{conversationId}}"));
+$add('Chat',$item('Send Message','POST',"$base/api/chat/messages",['studentId'=>'{{studentId}}','teacherId'=>'{{teacherId}}','message'=>'Hello teacher']));
+$add('Chat',$item('Send Attachment','POST',"$base/api/chat/attachments",['studentId'=>'{{studentId}}','teacherId'=>'{{teacherId}}','message'=>'Please check','fileName'=>'homework.pdf','mimeType'=>'application/pdf','fileUrl'=>'https://example.com/homework.pdf','fileSize'=>12345]));
+$add('Chat',$item('Mark Conversation Read','POST',"$base/api/chat/conversations/{{conversationId}}/read",[]));
 $add('Payments',$item('Create Order','POST',"$base/api/payments/create-order",['studentId'=>'{{studentId}}','amount'=>3500,'reference'=>'April 2026']));
 $add('Payments',$item('Verify Payment','POST',"$base/api/payments/verify",['paymentId'=>'{{paymentId}}','providerPaymentId'=>'{{providerPaymentId}}','signature'=>'{{paymentSignature}}']));
 $add('Payments',$item('Payment Webhook','POST',"$base/api/payments/webhook",['schoolCode'=>'{{schoolCode}}','paymentId'=>'{{paymentId}}','providerPaymentId'=>'{{providerPaymentId}}','status'=>'paid','signature'=>'{{webhookSignature}}'],false));
@@ -34,6 +40,6 @@ $collection=['info'=>['_postman_id'=>'979ce995-160a-4f2b-a8f0-57df40fc0126','nam
 foreach($folders as $name=>$requests)$collection['item'][]=['name'=>$name,'item'=>$requests];
 file_put_contents(dirname(__DIR__).'/postman/ET-Parent-API.postman_collection.json',json_encode($collection,JSON_PRETTY_PRINT|JSON_UNESCAPED_SLASHES));
 $env=['id'=>'a7a08cb7-89e4-4dce-9321-f168ccd696b1','name'=>'ET Parent Live','values'=>[],'_postman_variable_scope'=>'environment','_postman_exported_at'=>gmdate('c'),'_postman_exported_using'=>'ET API Builder'];
-foreach(['baseUrl'=>'https://api.eyetab.in','schoolCode'=>'B','parentCode'=>'PARENT007','password'=>'','accessToken'=>'','refreshToken'=>'','studentId'=>'14687','fromDate'=>'2026-09-01','toDate'=>'2026-09-30','month'=>'2026-09','homeworkId'=>'1','noticeId'=>'1','teacherId'=>'1','feeId'=>'1','paymentId'=>'','providerPaymentId'=>'','paymentSignature'=>'','webhookSignature'=>'','receiptId'=>'1','notificationId'=>'1','deviceId'=>'1'] as $k=>$v)$env['values'][]=['key'=>$k,'value'=>$v,'enabled'=>true];
+foreach(['baseUrl'=>'https://api.eyetab.in','schoolCode'=>'B','parentCode'=>'PARENT007','password'=>'','fcmToken'=>'','loginDeviceId'=>'android-device-key','accessToken'=>'','refreshToken'=>'','studentId'=>'14687','conversationId'=>'','fromDate'=>'2026-09-01','toDate'=>'2026-09-30','month'=>'2026-09','homeworkId'=>'1','noticeId'=>'1','teacherId'=>'1','feeId'=>'1','paymentId'=>'','providerPaymentId'=>'','paymentSignature'=>'','webhookSignature'=>'','receiptId'=>'1','notificationId'=>'1','deviceId'=>'1'] as $k=>$v)$env['values'][]=['key'=>$k,'value'=>$v,'enabled'=>true];
 file_put_contents(dirname(__DIR__).'/postman/ET-Parent-Live.postman_environment.json',json_encode($env,JSON_PRETTY_PRINT|JSON_UNESCAPED_SLASHES));
 echo"Parent Postman files generated.\n";

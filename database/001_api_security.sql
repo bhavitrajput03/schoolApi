@@ -12,20 +12,20 @@ CREATE TABLE dbo.SchoolTeacher(
 GO
 IF OBJECT_ID('dbo.ApiAuthToken','U') IS NULL
 CREATE TABLE dbo.ApiAuthToken(
- ApiAuthTokenID bigint IDENTITY PRIMARY KEY,ApiUserID uniqueidentifier NOT NULL,TokenHash char(64) NOT NULL UNIQUE,
+ ApiAuthTokenID int IDENTITY(1,1) PRIMARY KEY,ApiUserID uniqueidentifier NOT NULL,TokenHash char(64) NOT NULL UNIQUE,
  CreatedAt datetime2 NOT NULL CONSTRAINT DF_ApiToken_Created DEFAULT SYSUTCDATETIME(),ExpiresAt datetime2 NOT NULL,
  LastUsedAt datetime2 NULL,RevokedAt datetime2 NULL,IpAddress varchar(45) NULL,UserAgent nvarchar(500) NULL,
  CONSTRAINT FK_ApiToken_User FOREIGN KEY(ApiUserID) REFERENCES dbo.SchoolTeacher(ApiUserID));
 GO
 IF OBJECT_ID('dbo.ApiLoginAttempt','U') IS NULL
 BEGIN
- CREATE TABLE dbo.ApiLoginAttempt(ApiLoginAttemptID bigint IDENTITY PRIMARY KEY,AttemptKey char(64) NOT NULL,AttemptedAt datetime2 NOT NULL);
+ CREATE TABLE dbo.ApiLoginAttempt(ApiLoginAttemptID int IDENTITY(1,1) PRIMARY KEY,AttemptKey char(64) NOT NULL,AttemptedAt datetime2 NOT NULL);
  CREATE INDEX IX_ApiLoginAttempt_KeyTime ON dbo.ApiLoginAttempt(AttemptKey,AttemptedAt);
 END
 GO
 IF OBJECT_ID('dbo.ApiTeacherAssignment','U') IS NULL
 CREATE TABLE dbo.ApiTeacherAssignment(
- ApiTeacherAssignmentID bigint IDENTITY PRIMARY KEY,ApiUserID uniqueidentifier NOT NULL,OwnerSessionID bigint NOT NULL,
+ ApiTeacherAssignmentID int IDENTITY(1,1) PRIMARY KEY,ApiUserID uniqueidentifier NOT NULL,OwnerSessionID bigint NOT NULL,
  ClassID bigint NOT NULL,SectionID bigint NOT NULL,SubjectID bigint NOT NULL,IsActive bit NOT NULL CONSTRAINT DF_ApiAssignment_Active DEFAULT 1,
  CONSTRAINT UQ_ApiAssignment UNIQUE(ApiUserID,OwnerSessionID,ClassID,SectionID,SubjectID),
  CONSTRAINT FK_ApiAssignment_User FOREIGN KEY(ApiUserID) REFERENCES dbo.SchoolTeacher(ApiUserID),
@@ -37,7 +37,7 @@ GO
 
 IF OBJECT_ID('dbo.AppSubjectMaxMark','U') IS NULL
 CREATE TABLE dbo.AppSubjectMaxMark(
- AppSubjectMaxMarkID bigint IDENTITY(1,1) NOT NULL CONSTRAINT PK_AppSubjectMaxMark PRIMARY KEY,
+ AppSubjectMaxMarkID int IDENTITY(1,1) NOT NULL CONSTRAINT PK_AppSubjectMaxMark PRIMARY KEY,
  OwnerSessionID bigint NOT NULL,
  ClassID bigint NOT NULL,
  TermOptionID bigint NOT NULL,

@@ -3,6 +3,7 @@ declare(strict_types=1);
 namespace App\Controller;
 use App\Core\{Database,LoginPassword,ParentAuth,Request,Response,Validator};
 use App\Service\SchoolService;
+use App\Service\DeviceService;
 
 final class ParentAuthController {
     public function login(Request $r):never{
@@ -13,8 +14,8 @@ final class ParentAuthController {
         $provided=(string)$d['password'];$stored=(string)($parent['PasswordHash']??'');
         if(!$parent||!LoginPassword::matches($provided,$stored))Response::error('Invalid school code, user ID or password.',401,'INVALID_CREDENTIALS');
         if(LoginPassword::needsUpgrade($provided,$stored))$db->prepare('UPDATE AppParent SET PasswordHash=?,PasswordChangedAt=SYSUTCDATETIME() WHERE AppParentID=?')->execute([LoginPassword::hash($provided),$parent['AppParentID']]);
-        $db->prepare('UPDATE AppParent SET LastLoginAt=SYSUTCDATETIME() WHERE AppParentID=?')->execute([$parent['AppParentID']]);unset($parent['PasswordHash']);
-        Response::success(['parent'=>$parent,'academicSession'=>SchoolService::currentSession(),'auth'=>ParentAuth::issue((string)$parent['AppParentID'],$r)]);
+        $db->prepare('UPDATE AppParent SET LastLoginAt=SYSUTCDATETIME() WHERE AppParentID=?')->execute([$parent['AppParentID']]);DeviceService::parent($d,(int)$parent['AppParentID']);unset($parent['PasswordHash']);
+        Response::success(['parent'=>$parent,'academicSession'=>SchoolService::currentSession(),'auth'=>ParentAuth::issue((int)$parent['AppParentID'],$r)]);
     }
     public function refresh(Request $r):never{$d=$r->json();Validator::required($d,['refreshToken']);Response::success(['auth'=>ParentAuth::refresh((string)$d['refreshToken'],$r)]);}
     public function logout(Request $r,array $p):never{Database::connection()->prepare('UPDATE AppParentAuthToken SET RevokedAt=SYSUTCDATETIME() WHERE AccessTokenHash=?')->execute([$p['_tokenHash']]);Response::success(['message'=>'Logged out.']);}

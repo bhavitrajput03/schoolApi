@@ -18,7 +18,7 @@ final class ParentAuth {
         Database::connection()->prepare('UPDATE AppParentAuthToken SET LastUsedAt=SYSUTCDATETIME() WHERE AccessTokenHash=?')->execute([$hash]);
         $parent['_tokenHash']=$hash;return$parent;
     }
-    public static function issue(string $parentId,Request $request):array{
+    public static function issue(int $parentId,Request $request):array{
         $prefix=self::prefix('P:'.Database::schoolCode());
         $access=$prefix.'.'.self::random();$refresh=$prefix.'.'.self::random();
         $accessMinutes=max(15,min(1440,(int)Env::get('PARENT_ACCESS_TTL_MINUTES','60')));
@@ -35,7 +35,7 @@ final class ParentAuth {
             $st=$db->prepare('SELECT TOP 1 AppParentAuthTokenID,AppParentID FROM AppParentAuthToken WITH (UPDLOCK,HOLDLOCK) WHERE RefreshTokenHash=? AND RevokedAt IS NULL AND RefreshExpiresAt>SYSUTCDATETIME()');
             $st->execute([$hash]);$row=$st->fetch();if(!$row){$db->rollBack();Response::error('Refresh token is invalid or expired.',401,'INVALID_REFRESH_TOKEN');}
             $db->prepare('UPDATE AppParentAuthToken SET RevokedAt=SYSUTCDATETIME() WHERE AppParentAuthTokenID=?')->execute([$row['AppParentAuthTokenID']]);
-            $tokens=self::issue((string)$row['AppParentID'],$request);$db->commit();return$tokens;
+            $tokens=self::issue((int)$row['AppParentID'],$request);$db->commit();return$tokens;
         }catch(\Throwable $e){if($db->inTransaction())$db->rollBack();throw$e;}
     }
     private static function selectSchool(string $token):void{

@@ -8,7 +8,7 @@ final class PaymentController {
     public function create(Request $r,array $p):never{
         $d=$r->json();Validator::required($d,['studentId','amount']);$student=Validator::id($d['studentId'],'studentId');ParentService::student($p,$student);$amount=$d['amount'];if(!is_numeric($amount)||(float)$amount<=0)Response::error('amount must be positive.',422,'VALIDATION_ERROR');
         $provider=Env::get('PAYMENT_PROVIDER');if(!$provider)Response::error('Payment gateway is not configured.',503,'PAYMENT_GATEWAY_NOT_CONFIGURED');
-        $id=self::uuid();$reference=isset($d['reference'])?substr((string)$d['reference'],0,200):null;$st=Database::connection()->prepare('INSERT INTO AppPayment(AppPaymentID,AppParentID,StudentID,Amount,Provider,Status,RequestReference) VALUES(?,?,?,?,?,?,?)');$st->execute([$id,$p['AppParentID'],$student,round((float)$amount,2),$provider,'created',$reference]);
+        $reference=isset($d['reference'])?substr((string)$d['reference'],0,200):null;$st=Database::connection()->prepare('INSERT INTO AppPayment(AppParentID,StudentID,Amount,Provider,Status,RequestReference) OUTPUT INSERTED.AppPaymentID VALUES(?,?,?,?,?,?)');$st->execute([$p['AppParentID'],$student,round((float)$amount,2),$provider,'created',$reference]);$id=(int)$st->fetchColumn();
         Response::success(['paymentId'=>$id,'provider'=>$provider,'amount'=>round((float)$amount,2),'currency'=>'INR','status'=>'created'],201);
     }
     public function verify(Request $r,array $p):never{
@@ -25,5 +25,4 @@ final class PaymentController {
     public function status(Request $r,array $p,string $payment):never{
         $st=Database::connection()->prepare('SELECT TOP 1 AppPaymentID paymentId,StudentID studentId,CAST(Amount AS float) amount,Currency currency,Provider provider,ProviderOrderID providerOrderId,ProviderPaymentID providerPaymentId,Status status,CreatedAt createdAt,UpdatedAt updatedAt FROM AppPayment WHERE AppPaymentID=? AND AppParentID=?');$st->execute([$payment,$p['AppParentID']]);$row=$st->fetch();if(!$row)Response::error('Payment not found.',404,'PAYMENT_NOT_FOUND');Response::success(['payment'=>$row]);
     }
-    private static function uuid():string{$d=random_bytes(16);$d[6]=chr((ord($d[6])&0x0f)|0x40);$d[8]=chr((ord($d[8])&0x3f)|0x80);return vsprintf('%s%s-%s-%s-%s-%s%s%s',str_split(bin2hex($d),4));}
 }

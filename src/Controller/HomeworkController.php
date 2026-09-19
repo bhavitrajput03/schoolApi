@@ -6,8 +6,8 @@ use App\Service\{ParentService,SchoolService};
 
 final class HomeworkController {
     public function list(Request $r,array $p,int $student):never{
-        $ctx=ParentService::student($p,$student);$subject=$r->query('subjectId');$sql="SELECT h.AppHomeworkID id,h.Title title,h.Description description,h.HomeworkDate homeworkDate,h.DueDate dueDate,h.AttachmentUrl attachmentUrl,h.SubjectID subjectId,s.CBSEExamSubject subjectName,h.CreatedAt createdAt
-          FROM AppHomework h LEFT JOIN CBSEExamSubject s ON s.CBSEExamSubjectID=h.SubjectID
+        $ctx=ParentService::student($p,$student);$subject=$r->query('subjectId');$sql="SELECT h.AppHomeworkID id,h.Title title,h.Description description,h.HomeworkDate homeworkDate,h.DueDate dueDate,h.AttachmentUrl attachmentUrl,h.SubjectID subjectId,s.CBSEExamSubject subjectName,h.TeacherEmployeeID teacherId,t.DisplayName teacherName,h.CreatedAt createdAt
+          FROM AppHomework h LEFT JOIN CBSEExamSubject s ON s.CBSEExamSubjectID=h.SubjectID LEFT JOIN SchoolTeacher t ON t.EmployeeID=h.TeacherEmployeeID
           WHERE h.OwnerSessionID=? AND h.ClassID=? AND (h.SectionID IS NULL OR h.SectionID=?) AND h.IsActive=1";$args=[$ctx['OwnerSessionID'],$ctx['ClassID'],$ctx['SectionID']];
         if($subject!==null){$sql.=' AND h.SubjectID=?';$args[]=(int)$subject;}$sql.=' ORDER BY h.HomeworkDate DESC,h.AppHomeworkID DESC';$st=Database::connection()->prepare($sql);$st->execute($args);Response::success(['homework'=>$st->fetchAll()]);
     }

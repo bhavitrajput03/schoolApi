@@ -1,225 +1,838 @@
 {
-  "info": {
-    "_postman_id": "6b84092e-8174-4e40-a684-etteacherapi",
-    "name": "ET Teacher API - Live",
-    "description": "Production collection for https://api.eyetab.in backed by SchoolManagement. Set the password collection variable, run Login first, and the access token is stored automatically. Requests prefixed WRITE modify live data.",
-    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
-  },
-  "auth": {
-    "type": "bearer",
-    "bearer": [{"key": "token", "value": "{{accessToken}}", "type": "string"}]
-  },
-  "variable": [
-    {"key": "baseUrl", "value": "https://api.eyetab.in", "type": "string"},
-    {"key": "schoolCode", "value": "B", "type": "string"},
-    {"key": "username", "value": "anita", "type": "string"},
-    {"key": "password", "value": "", "type": "string"},
-    {"key": "newPassword", "value": "", "type": "string"},
-    {"key": "accessToken", "value": "", "type": "string"},
-    {"key": "sessionId", "value": "13", "type": "string"},
-    {"key": "classId", "value": "155", "type": "string"},
-    {"key": "sectionId", "value": "61", "type": "string"},
-    {"key": "subjectId", "value": "40", "type": "string"},
-    {"key": "secondSubjectId", "value": "41", "type": "string"},
-    {"key": "termOptionId", "value": "38", "type": "string"},
-    {"key": "studentId", "value": "14687", "type": "string"},
-    {"key": "attendanceDate", "value": "2026-08-28", "type": "string"}
-  ],
-  "event": [
-    {
-      "listen": "test",
-      "script": {
-        "type": "text/javascript",
-        "exec": [
-          "pm.test('Response is JSON', function () { pm.response.to.be.json; });",
-          "const json = pm.response.json();",
-          "pm.test('Uses standard response envelope', function () { pm.expect(json).to.have.property('success'); });"
+    "info": {
+        "_postman_id": "6b84092e-8174-4e40-a684-etteacherapi",
+        "name": "ET Teacher API - Live",
+        "description": "Production collection for https://api.eyetab.in backed by SchoolManagement. Set the password collection variable, run Login first, and the access token is stored automatically. Requests prefixed WRITE modify live data.",
+        "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+    },
+    "auth": {
+        "type": "bearer",
+        "bearer": [
+            {
+                "key": "token",
+                "value": "{{accessToken}}",
+                "type": "string"
+            }
         ]
-      }
-    }
-  ],
-  "item": [
-    {
-      "name": "01 Authentication",
-      "item": [
+    },
+    "variable": [
         {
-          "name": "Login",
-          "event": [{
+            "key": "baseUrl",
+            "value": "https://api.eyetab.in",
+            "type": "string"
+        },
+        {
+            "key": "schoolCode",
+            "value": "B",
+            "type": "string"
+        },
+        {
+            "key": "username",
+            "value": "anita",
+            "type": "string"
+        },
+        {
+            "key": "password",
+            "value": "",
+            "type": "string"
+        },
+        {
+            "key": "newPassword",
+            "value": "",
+            "type": "string"
+        },
+        {
+            "key": "accessToken",
+            "value": "",
+            "type": "string"
+        },
+        {
+            "key": "sessionId",
+            "value": "13",
+            "type": "string"
+        },
+        {
+            "key": "classId",
+            "value": "155",
+            "type": "string"
+        },
+        {
+            "key": "sectionId",
+            "value": "61",
+            "type": "string"
+        },
+        {
+            "key": "subjectId",
+            "value": "40",
+            "type": "string"
+        },
+        {
+            "key": "secondSubjectId",
+            "value": "41",
+            "type": "string"
+        },
+        {
+            "key": "termOptionId",
+            "value": "38",
+            "type": "string"
+        },
+        {
+            "key": "studentId",
+            "value": "14687",
+            "type": "string"
+        },
+        {
+            "key": "attendanceDate",
+            "value": "2026-08-28",
+            "type": "string"
+        },
+        {
+            "key": "fcmToken",
+            "value": "",
+            "type": "string"
+        },
+        {
+            "key": "loginDeviceId",
+            "value": "android-device-key",
+            "type": "string"
+        },
+        {
+            "key": "noticeId",
+            "value": "",
+            "type": "string"
+        },
+        {
+            "key": "homeworkId",
+            "value": "",
+            "type": "string"
+        },
+        {
+            "key": "contentDate",
+            "value": "2026-09-18",
+            "type": "string"
+        },
+        {
+            "key": "contentDueDate",
+            "value": "2026-09-19",
+            "type": "string"
+        }
+    ],
+    "event": [
+        {
             "listen": "test",
-            "script": {"type": "text/javascript", "exec": [
-              "pm.test('Login successful', function () { pm.response.to.have.status(200); });",
-              "const json = pm.response.json();",
-              "pm.expect(json.success).to.eql(true);",
-              "pm.expect(json.data.auth.accessToken).to.be.a('string').and.not.empty;",
-              "pm.collectionVariables.set('accessToken', json.data.auth.accessToken);"
-            ]}
-          }],
-          "request": {
-            "auth": {"type": "noauth"},
-            "method": "POST",
-            "header": [{"key": "Content-Type", "value": "application/json"}],
-            "body": {"mode": "raw", "raw": "{\n  \"schoolCode\": \"{{schoolCode}}\",\n  \"username\": \"{{username}}\",\n  \"password\": \"{{password}}\"\n}"},
-            "url": {"raw": "{{baseUrl}}/api/auth/login", "host": ["{{baseUrl}}"], "path": ["api","auth","login"]}
-          }
-        },
-        {
-          "name": "Current User",
-          "request": {"method": "GET", "url": {"raw": "{{baseUrl}}/api/auth/me", "host": ["{{baseUrl}}"], "path": ["api","auth","me"]}}
-        },
-        {
-          "name": "Change Password",
-          "request": {
-            "method": "POST",
-            "header": [{"key": "Content-Type", "value": "application/json"}],
-            "body": {"mode": "raw", "raw": "{\n  \"currentPassword\": \"{{password}}\",\n  \"newPassword\": \"{{newPassword}}\"\n}"},
-            "url": {"raw": "{{baseUrl}}/api/auth/change-password", "host": ["{{baseUrl}}"], "path": ["api","auth","change-password"]}
-          }
-        },
-        {
-          "name": "Logout",
-          "event": [{"listen": "test", "script": {"type": "text/javascript", "exec": [
-            "if (pm.response.code === 200) { pm.collectionVariables.unset('accessToken'); }"
-          ]}}],
-          "request": {"method": "POST", "url": {"raw": "{{baseUrl}}/api/auth/logout", "host": ["{{baseUrl}}"], "path": ["api","auth","logout"]}}
-        }
-      ]
-    },
-    {
-      "name": "02 Teacher",
-      "item": [
-        {
-          "name": "Dashboard",
-          "request": {"method": "GET", "url": {"raw": "{{baseUrl}}/api/teacher/dashboard", "host": ["{{baseUrl}}"], "path": ["api","teacher","dashboard"]}}
-        },
-        {
-          "name": "Classes",
-          "request": {"method": "GET", "url": {"raw": "{{baseUrl}}/api/teacher/classes", "host": ["{{baseUrl}}"], "path": ["api","teacher","classes"]}}
-        },
-        {
-          "name": "Sections",
-          "request": {"method": "GET", "url": {"raw": "{{baseUrl}}/api/teacher/classes/{{classId}}/sections", "host": ["{{baseUrl}}"], "path": ["api","teacher","classes","{{classId}}","sections"]}}
-        },
-        {
-          "name": "Subjects",
-          "request": {"method": "GET", "url": {"raw": "{{baseUrl}}/api/teacher/classes/{{classId}}/sections/{{sectionId}}/subjects", "host": ["{{baseUrl}}"], "path": ["api","teacher","classes","{{classId}}","sections","{{sectionId}}","subjects"]}}
-        },
-        {
-          "name": "Students Roster",
-          "request": {"method": "GET", "url": {"raw": "{{baseUrl}}/api/teacher/classes/{{classId}}/sections/{{sectionId}}/students", "host": ["{{baseUrl}}"], "path": ["api","teacher","classes","{{classId}}","sections","{{sectionId}}","students"]}}
-        }
-      ]
-    },
-    {
-      "name": "03 Exams",
-      "item": [
-        {
-          "name": "Terms",
-          "request": {"method": "GET", "url": {"raw": "{{baseUrl}}/api/exams/terms", "host": ["{{baseUrl}}"], "path": ["api","exams","terms"]}}
-        }
-      ]
-    },
-    {
-      "name": "04 Marks",
-      "item": [
-        {
-          "name": "Get Max Marks",
-          "request": {
-            "method": "GET",
-            "url": {
-              "raw": "{{baseUrl}}/api/marks/max-marks?classId={{classId}}&sectionId={{sectionId}}&termOptionId={{termOptionId}}",
-              "host": ["{{baseUrl}}"], "path": ["api","marks","max-marks"],
-              "query": [
-                {"key": "classId", "value": "{{classId}}"},
-                {"key": "sectionId", "value": "{{sectionId}}"},
-                {"key": "termOptionId", "value": "{{termOptionId}}"}
-              ]
+            "script": {
+                "type": "text/javascript",
+                "exec": [
+                    "pm.test('Response is JSON', function () { pm.response.to.be.json; });",
+                    "const json = pm.response.json();",
+                    "pm.test('Uses standard response envelope', function () { pm.expect(json).to.have.property('success'); });"
+                ]
             }
-          }
-        },
-        {
-          "name": "WRITE - Update Max Marks",
-          "request": {
-            "method": "POST",
-            "header": [{"key": "Content-Type", "value": "application/json"}],
-            "body": {"mode": "raw", "raw": "{\n  \"classId\": {{classId}},\n  \"sectionId\": {{sectionId}},\n  \"termOptionId\": {{termOptionId}},\n  \"subjects\": [\n    {\"subjectId\": {{subjectId}}, \"maxMarks\": 80},\n    {\"subjectId\": {{secondSubjectId}}, \"maxMarks\": 80}\n  ]\n}"},
-            "url": {"raw": "{{baseUrl}}/api/marks/max-marks", "host": ["{{baseUrl}}"], "path": ["api","marks","max-marks"]}
-          }
-        },
-        {
-          "name": "Subject-wise Students",
-          "request": {
-            "method": "GET",
-            "url": {
-              "raw": "{{baseUrl}}/api/marks/subject-wise/students?classId={{classId}}&sectionId={{sectionId}}&termOptionId={{termOptionId}}&subjectId={{subjectId}}",
-              "host": ["{{baseUrl}}"], "path": ["api","marks","subject-wise","students"],
-              "query": [
-                {"key": "classId", "value": "{{classId}}"},
-                {"key": "sectionId", "value": "{{sectionId}}"},
-                {"key": "termOptionId", "value": "{{termOptionId}}"},
-                {"key": "subjectId", "value": "{{subjectId}}"}
-              ]
-            }
-          }
-        },
-        {
-          "name": "WRITE - Save Subject-wise Marks",
-          "request": {
-            "method": "POST",
-            "header": [{"key": "Content-Type", "value": "application/json"}],
-            "body": {"mode": "raw", "raw": "{\n  \"classId\": {{classId}},\n  \"sectionId\": {{sectionId}},\n  \"termOptionId\": {{termOptionId}},\n  \"subjectId\": {{subjectId}},\n  \"maxMarks\": 80,\n  \"marks\": [\n    {\n      \"studentId\": {{studentId}},\n      \"obtainedMarks\": 72,\n      \"isAbsent\": false,\n      \"isMedical\": false\n    }\n  ]\n}"},
-            "url": {"raw": "{{baseUrl}}/api/marks/subject-wise", "host": ["{{baseUrl}}"], "path": ["api","marks","subject-wise"]}
-          }
-        },
-        {
-          "name": "Student-wise Marks",
-          "request": {
-            "method": "GET",
-            "url": {
-              "raw": "{{baseUrl}}/api/marks/student-wise/{{studentId}}?termOptionId={{termOptionId}}",
-              "host": ["{{baseUrl}}"], "path": ["api","marks","student-wise","{{studentId}}"],
-              "query": [{"key": "termOptionId", "value": "{{termOptionId}}"}]
-            }
-          }
-        },
-        {
-          "name": "WRITE - Save Student-wise Marks",
-          "request": {
-            "method": "POST",
-            "header": [{"key": "Content-Type", "value": "application/json"}],
-            "body": {"mode": "raw", "raw": "{\n  \"studentId\": {{studentId}},\n  \"termOptionId\": {{termOptionId}},\n  \"marks\": [\n    {\"subjectId\": {{subjectId}}, \"maxMarks\": 80, \"obtainedMarks\": 72, \"isAbsent\": false, \"isMedical\": false},\n    {\"subjectId\": {{secondSubjectId}}, \"maxMarks\": 80, \"obtainedMarks\": 68, \"isAbsent\": false, \"isMedical\": false}\n  ]\n}"},
-            "url": {"raw": "{{baseUrl}}/api/marks/student-wise", "host": ["{{baseUrl}}"], "path": ["api","marks","student-wise"]}
-          }
         }
-      ]
-    },
-    {
-      "name": "05 Attendance",
-      "item": [
+    ],
+    "item": [
         {
-          "name": "Attendance Students",
-          "request": {
-            "method": "GET",
-            "url": {
-              "raw": "{{baseUrl}}/api/attendance/students?classId={{classId}}&sectionId={{sectionId}}&date={{attendanceDate}}",
-              "host": ["{{baseUrl}}"], "path": ["api","attendance","students"],
-              "query": [
-                {"key": "classId", "value": "{{classId}}"},
-                {"key": "sectionId", "value": "{{sectionId}}"},
-                {"key": "date", "value": "{{attendanceDate}}"}
-              ]
-            }
-          }
+            "name": "01 Authentication",
+            "item": [
+                {
+                    "name": "Login",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "pm.test('Login successful', function () { pm.response.to.have.status(200); });",
+                                    "const json = pm.response.json();",
+                                    "pm.expect(json.success).to.eql(true);",
+                                    "pm.expect(json.data.auth.accessToken).to.be.a('string').and.not.empty;",
+                                    "pm.collectionVariables.set('accessToken', json.data.auth.accessToken);"
+                                ]
+                            }
+                        }
+                    ],
+                    "request": {
+                        "auth": {
+                            "type": "noauth"
+                        },
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n  \"schoolCode\": \"{{schoolCode}}\",\n  \"username\": \"{{username}}\",\n  \"password\": \"{{password}}\",\n  \"fcmToken\": \"{{fcmToken}}\",\n  \"deviceId\": \"{{loginDeviceId}}\",\n  \"platform\": \"android\",\n  \"appVersion\": \"1.0.0\"\n}"
+                        },
+                        "url": {
+                            "raw": "{{baseUrl}}/api/auth/login",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "api",
+                                "auth",
+                                "login"
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "Current User",
+                    "request": {
+                        "method": "GET",
+                        "url": {
+                            "raw": "{{baseUrl}}/api/auth/me",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "api",
+                                "auth",
+                                "me"
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "Change Password",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n  \"currentPassword\": \"{{password}}\",\n  \"newPassword\": \"{{newPassword}}\"\n}"
+                        },
+                        "url": {
+                            "raw": "{{baseUrl}}/api/auth/change-password",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "api",
+                                "auth",
+                                "change-password"
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "Logout",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "if (pm.response.code === 200) { pm.collectionVariables.unset('accessToken'); }"
+                                ]
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "POST",
+                        "url": {
+                            "raw": "{{baseUrl}}/api/auth/logout",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "api",
+                                "auth",
+                                "logout"
+                            ]
+                        }
+                    }
+                }
+            ]
         },
         {
-          "name": "WRITE - Save Attendance",
-          "request": {
-            "method": "POST",
-            "header": [{"key": "Content-Type", "value": "application/json"}],
-            "body": {"mode": "raw", "raw": "{\n  \"classId\": {{classId}},\n  \"sectionId\": {{sectionId}},\n  \"date\": \"{{attendanceDate}}\",\n  \"attendance\": [\n    {\"studentId\": {{studentId}}, \"status\": \"P\"}\n  ]\n}"},
-            "url": {"raw": "{{baseUrl}}/api/attendance", "host": ["{{baseUrl}}"], "path": ["api","attendance"]}
-          }
+            "name": "02 Teacher",
+            "item": [
+                {
+                    "name": "Dashboard",
+                    "request": {
+                        "method": "GET",
+                        "url": {
+                            "raw": "{{baseUrl}}/api/teacher/dashboard",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "api",
+                                "teacher",
+                                "dashboard"
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "Classes",
+                    "request": {
+                        "method": "GET",
+                        "url": {
+                            "raw": "{{baseUrl}}/api/teacher/classes",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "api",
+                                "teacher",
+                                "classes"
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "Sections",
+                    "request": {
+                        "method": "GET",
+                        "url": {
+                            "raw": "{{baseUrl}}/api/teacher/classes/{{classId}}/sections",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "api",
+                                "teacher",
+                                "classes",
+                                "{{classId}}",
+                                "sections"
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "Subjects",
+                    "request": {
+                        "method": "GET",
+                        "url": {
+                            "raw": "{{baseUrl}}/api/teacher/classes/{{classId}}/sections/{{sectionId}}/subjects",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "api",
+                                "teacher",
+                                "classes",
+                                "{{classId}}",
+                                "sections",
+                                "{{sectionId}}",
+                                "subjects"
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "Students Roster",
+                    "request": {
+                        "method": "GET",
+                        "url": {
+                            "raw": "{{baseUrl}}/api/teacher/classes/{{classId}}/sections/{{sectionId}}/students",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "api",
+                                "teacher",
+                                "classes",
+                                "{{classId}}",
+                                "sections",
+                                "{{sectionId}}",
+                                "students"
+                            ]
+                        }
+                    }
+                }
+            ]
+        },
+        {
+            "name": "03 Exams",
+            "item": [
+                {
+                    "name": "Terms",
+                    "request": {
+                        "method": "GET",
+                        "url": {
+                            "raw": "{{baseUrl}}/api/exams/terms",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "api",
+                                "exams",
+                                "terms"
+                            ]
+                        }
+                    }
+                }
+            ]
+        },
+        {
+            "name": "04 Marks",
+            "item": [
+                {
+                    "name": "Get Max Marks",
+                    "request": {
+                        "method": "GET",
+                        "url": {
+                            "raw": "{{baseUrl}}/api/marks/max-marks?classId={{classId}}&sectionId={{sectionId}}&termOptionId={{termOptionId}}",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "api",
+                                "marks",
+                                "max-marks"
+                            ],
+                            "query": [
+                                {
+                                    "key": "classId",
+                                    "value": "{{classId}}"
+                                },
+                                {
+                                    "key": "sectionId",
+                                    "value": "{{sectionId}}"
+                                },
+                                {
+                                    "key": "termOptionId",
+                                    "value": "{{termOptionId}}"
+                                }
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "WRITE - Update Max Marks",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n  \"classId\": {{classId}},\n  \"sectionId\": {{sectionId}},\n  \"termOptionId\": {{termOptionId}},\n  \"subjects\": [\n    {\"subjectId\": {{subjectId}}, \"maxMarks\": 80},\n    {\"subjectId\": {{secondSubjectId}}, \"maxMarks\": 80}\n  ]\n}"
+                        },
+                        "url": {
+                            "raw": "{{baseUrl}}/api/marks/max-marks",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "api",
+                                "marks",
+                                "max-marks"
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "Subject-wise Students",
+                    "request": {
+                        "method": "GET",
+                        "url": {
+                            "raw": "{{baseUrl}}/api/marks/subject-wise/students?classId={{classId}}&sectionId={{sectionId}}&termOptionId={{termOptionId}}&subjectId={{subjectId}}",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "api",
+                                "marks",
+                                "subject-wise",
+                                "students"
+                            ],
+                            "query": [
+                                {
+                                    "key": "classId",
+                                    "value": "{{classId}}"
+                                },
+                                {
+                                    "key": "sectionId",
+                                    "value": "{{sectionId}}"
+                                },
+                                {
+                                    "key": "termOptionId",
+                                    "value": "{{termOptionId}}"
+                                },
+                                {
+                                    "key": "subjectId",
+                                    "value": "{{subjectId}}"
+                                }
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "WRITE - Save Subject-wise Marks",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n  \"classId\": {{classId}},\n  \"sectionId\": {{sectionId}},\n  \"termOptionId\": {{termOptionId}},\n  \"subjectId\": {{subjectId}},\n  \"maxMarks\": 80,\n  \"marks\": [\n    {\n      \"studentId\": {{studentId}},\n      \"obtainedMarks\": 72,\n      \"isAbsent\": false,\n      \"isMedical\": false\n    }\n  ]\n}"
+                        },
+                        "url": {
+                            "raw": "{{baseUrl}}/api/marks/subject-wise",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "api",
+                                "marks",
+                                "subject-wise"
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "Student-wise Marks",
+                    "request": {
+                        "method": "GET",
+                        "url": {
+                            "raw": "{{baseUrl}}/api/marks/student-wise/{{studentId}}?termOptionId={{termOptionId}}",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "api",
+                                "marks",
+                                "student-wise",
+                                "{{studentId}}"
+                            ],
+                            "query": [
+                                {
+                                    "key": "termOptionId",
+                                    "value": "{{termOptionId}}"
+                                }
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "WRITE - Save Student-wise Marks",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n  \"studentId\": {{studentId}},\n  \"termOptionId\": {{termOptionId}},\n  \"marks\": [\n    {\"subjectId\": {{subjectId}}, \"maxMarks\": 80, \"obtainedMarks\": 72, \"isAbsent\": false, \"isMedical\": false},\n    {\"subjectId\": {{secondSubjectId}}, \"maxMarks\": 80, \"obtainedMarks\": 68, \"isAbsent\": false, \"isMedical\": false}\n  ]\n}"
+                        },
+                        "url": {
+                            "raw": "{{baseUrl}}/api/marks/student-wise",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "api",
+                                "marks",
+                                "student-wise"
+                            ]
+                        }
+                    }
+                }
+            ]
+        },
+        {
+            "name": "05 Attendance",
+            "item": [
+                {
+                    "name": "Attendance Students",
+                    "request": {
+                        "method": "GET",
+                        "url": {
+                            "raw": "{{baseUrl}}/api/attendance/students?classId={{classId}}&sectionId={{sectionId}}&date={{attendanceDate}}",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "api",
+                                "attendance",
+                                "students"
+                            ],
+                            "query": [
+                                {
+                                    "key": "classId",
+                                    "value": "{{classId}}"
+                                },
+                                {
+                                    "key": "sectionId",
+                                    "value": "{{sectionId}}"
+                                },
+                                {
+                                    "key": "date",
+                                    "value": "{{attendanceDate}}"
+                                }
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "WRITE - Save Attendance",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n  \"classId\": {{classId}},\n  \"sectionId\": {{sectionId}},\n  \"date\": \"{{attendanceDate}}\",\n  \"attendance\": [\n    {\"studentId\": {{studentId}}, \"status\": \"P\"}\n  ]\n}"
+                        },
+                        "url": {
+                            "raw": "{{baseUrl}}/api/attendance",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "api",
+                                "attendance"
+                            ]
+                        }
+                    }
+                }
+            ]
+        },
+        {
+            "name": "06 Notices & Homework",
+            "item": [
+                {
+                    "name": "WRITE - Publish Section Notice",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "const json=pm.response.json(); if(json.success){pm.collectionVariables.set('noticeId',json.data.notice.id);}"
+                                ]
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n    \"noticeType\": \"academic\",\n    \"targetType\": \"section\",\n    \"classId\": \"{{classId}}\",\n    \"sectionId\": \"{{sectionId}}\",\n    \"title\": \"Tomorrow class update\",\n    \"body\": \"Please bring the required notebook.\",\n    \"attachmentUrl\": null\n}",
+                            "options": {
+                                "raw": {
+                                    "language": "json"
+                                }
+                            }
+                        },
+                        "url": {
+                            "raw": "{{baseUrl}}/api/teacher/notices",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "api",
+                                "teacher",
+                                "notices"
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "WRITE - Publish Student Notice",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "const json=pm.response.json(); if(json.success){pm.collectionVariables.set('noticeId',json.data.notice.id);}"
+                                ]
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n    \"noticeType\": \"urgent\",\n    \"targetType\": \"student\",\n    \"classId\": \"{{classId}}\",\n    \"sectionId\": \"{{sectionId}}\",\n    \"studentId\": \"{{studentId}}\",\n    \"title\": \"Parent attention required\",\n    \"body\": \"Please contact the class teacher.\",\n    \"attachmentUrl\": null\n}",
+                            "options": {
+                                "raw": {
+                                    "language": "json"
+                                }
+                            }
+                        },
+                        "url": {
+                            "raw": "{{baseUrl}}/api/teacher/notices",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "api",
+                                "teacher",
+                                "notices"
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "WRITE - Publish Class Notice",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "const json=pm.response.json(); if(json.success){pm.collectionVariables.set('noticeId',json.data.notice.id);}"
+                                ]
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n    \"noticeType\": \"exam\",\n    \"targetType\": \"class\",\n    \"classId\": \"{{classId}}\",\n    \"title\": \"Exam schedule\",\n    \"body\": \"The exam schedule has been published.\",\n    \"attachmentUrl\": null\n}",
+                            "options": {
+                                "raw": {
+                                    "language": "json"
+                                }
+                            }
+                        },
+                        "url": {
+                            "raw": "{{baseUrl}}/api/teacher/notices",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "api",
+                                "teacher",
+                                "notices"
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "WRITE - Publish School Notice (Admin)",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "const json=pm.response.json(); if(json.success){pm.collectionVariables.set('noticeId',json.data.notice.id);}"
+                                ]
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n    \"noticeType\": \"holiday\",\n    \"targetType\": \"school\",\n    \"title\": \"School holiday\",\n    \"body\": \"The school will remain closed tomorrow.\",\n    \"attachmentUrl\": null\n}",
+                            "options": {
+                                "raw": {
+                                    "language": "json"
+                                }
+                            }
+                        },
+                        "url": {
+                            "raw": "{{baseUrl}}/api/teacher/notices",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "api",
+                                "teacher",
+                                "notices"
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "WRITE - Assign Homework",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "const json=pm.response.json(); if(json.success){pm.collectionVariables.set('homeworkId',json.data.homework.id);}"
+                                ]
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n    \"classId\": \"{{classId}}\",\n    \"sectionId\": \"{{sectionId}}\",\n    \"subjectId\": \"{{subjectId}}\",\n    \"title\": \"Chapter revision\",\n    \"description\": \"Complete questions 1 to 10.\",\n    \"homeworkDate\": \"{{contentDate}}\",\n    \"dueDate\": \"{{contentDueDate}}\",\n    \"attachmentUrl\": null\n}",
+                            "options": {
+                                "raw": {
+                                    "language": "json"
+                                }
+                            }
+                        },
+                        "url": {
+                            "raw": "{{baseUrl}}/api/teacher/homework",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "api",
+                                "teacher",
+                                "homework"
+                            ]
+                        }
+                    }
+                }
+            ]
         }
-      ]
-    }
-  ]
+    ]
 }

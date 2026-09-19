@@ -3,6 +3,7 @@ declare(strict_types=1);
 namespace App\Controller;
 use App\Core\{Auth,Database,LoginPassword,Request,Response,Validator};
 use App\Service\SchoolService;
+use App\Service\DeviceService;
 final class AuthController {
     public function login(Request $r): never {
         $d=$r->json();Validator::required($d,['schoolCode','username','password']);$school=strtoupper(trim((string)$d['schoolCode']));$username=mb_strtolower(trim((string)$d['username']));
@@ -15,7 +16,7 @@ final class AuthController {
         if(LoginPassword::needsUpgrade($plainPassword,$storedPassword)){
             $db->prepare('UPDATE SchoolTeacher SET PasswordHash=?,PasswordChangedAt=SYSUTCDATETIME() WHERE ApiUserID=?')->execute([LoginPassword::hash($plainPassword),$user['ApiUserID']]);
         }
-        $db->prepare('DELETE FROM ApiLoginAttempt WHERE AttemptKey=?')->execute([$key]);$db->prepare('UPDATE SchoolTeacher SET LastLoginAt=SYSUTCDATETIME() WHERE ApiUserID=?')->execute([$user['ApiUserID']]);unset($user['PasswordHash']);
+        $db->prepare('DELETE FROM ApiLoginAttempt WHERE AttemptKey=?')->execute([$key]);$db->prepare('UPDATE SchoolTeacher SET LastLoginAt=SYSUTCDATETIME() WHERE ApiUserID=?')->execute([$user['ApiUserID']]);DeviceService::teacher($d,$user['ApiUserID']);unset($user['PasswordHash']);
         Response::success([
             'user'=>$user,
             'academicSession'=>SchoolService::currentSession(),
