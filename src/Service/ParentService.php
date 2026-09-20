@@ -10,6 +10,12 @@ final class ParentService {
               FROM AppParentStudent link JOIN StudentSession ss ON ss.StudentID=link.StudentID
               WHERE link.AppParentID=? AND link.StudentID=? AND ss.OwnerSessionID=? AND ss.IsLeave=0';
         $st=Database::connection()->prepare($sql);$st->execute([$parent['AppParentID'],$studentId,$session]);$row=$st->fetch();
+        if(!$row){
+            $sql2='SELECT TOP 1 COALESCE(ss.ClassID,0) ClassID,COALESCE(ss.SectionID,0) SectionID,COALESCE(ss.OwnerSessionID,?) OwnerSessionID
+                   FROM AppParentStudent link LEFT JOIN StudentSession ss ON ss.StudentID=link.StudentID
+                   WHERE link.AppParentID=? AND link.StudentID=? ORDER BY ss.OwnerSessionID DESC';
+            $st2=Database::connection()->prepare($sql2);$st2->execute([$session,$parent['AppParentID'],$studentId]);$row=$st2->fetch();
+        }
         if(!$row)Response::error('Student is not linked with this parent.',403,'STUDENT_FORBIDDEN');return$row;
     }
     public static function bool(mixed $value):int{return filter_var($value,FILTER_VALIDATE_BOOL)?1:0;}

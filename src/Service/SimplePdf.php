@@ -12,9 +12,19 @@ final class SimplePdf {
     private const PALE='0.950 0.970 0.995';
 
     public static function feeStatement(array $student,array $summary,array $dues,array $receipts,string $filename):never {
+        $ledger=(new \App\Controller\FeeController())->ledger($dues,$receipts);
+        usort($ledger,static fn($a,$b)=>strcmp((string)($a['date']??''),(string)($b['date']??'')));
         $rows=[];
-        foreach($dues as $d)$rows[]=[self::clean($d['date']??''),self::clean($d['description']??'Fee due'),self::money($d['amount']??0),self::money($d['paid']??0),self::money($d['balance']??0)];
-        foreach($receipts as $r)$rows[]=[self::clean($r['date']??''),'Receipt '.self::clean($r['receiptNumber']??$r['id']??''),'-',self::money($r['amount']??0),self::money($r['balance']??0)];
+        foreach($ledger as $item){
+            $isDue=($item['type']??'')==='due';
+            $rows[]=[
+                self::clean($item['date']??$item['dueDate']??''),
+                self::clean($item['description']??$item['title']??'Transaction'),
+                $isDue?self::money($item['amount']??0):'-',
+                !$isDue?self::money($item['amount']??0):'-',
+                self::money($item['balance']??0)
+            ];
+        }
         $meta=[['Student',self::clean($student['name']??'Student')],['Student ID',self::clean($student['id']??'')],['Admission No.',self::clean($student['admissionNo']??'-')],['Generated',date('d M Y, h:i A')]];
         $total=$summary['totalFee']??$summary['totalDue']??0;
         $cards=[['Total fee',self::money($total)],['Discount',self::money($summary['discount']??0)],['Paid',self::money($summary['paid']??0)],['Balance',self::money($summary['balance']??0)]];
