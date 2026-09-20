@@ -115,6 +115,11 @@
             "key": "contentDueDate",
             "value": "2026-09-19",
             "type": "string"
+        },
+        {
+            "key": "conversationId",
+            "value": "",
+            "type": "string"
         }
     ],
     "event": [
@@ -828,6 +833,180 @@
                                 "api",
                                 "teacher",
                                 "homework"
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "My Published Homework",
+                    "request": {
+                        "method": "GET",
+                        "url": {
+                            "raw": "{{baseUrl}}/api/teacher/homework?classId={{classId}}&sectionId={{sectionId}}&subjectId={{subjectId}}",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "api",
+                                "teacher",
+                                "homework"
+                            ],
+                            "query": [
+                                {
+                                    "key": "classId",
+                                    "value": "{{classId}}"
+                                },
+                                {
+                                    "key": "sectionId",
+                                    "value": "{{sectionId}}"
+                                },
+                                {
+                                    "key": "subjectId",
+                                    "value": "{{subjectId}}"
+                                }
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "Homework Given to Student",
+                    "request": {
+                        "method": "GET",
+                        "url": {
+                            "raw": "{{baseUrl}}/api/teacher/students/{{studentId}}/homework",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "api",
+                                "teacher",
+                                "students",
+                                "{{studentId}}",
+                                "homework"
+                            ]
+                        }
+                    }
+                }
+            ]
+        },
+        {
+            "name": "07 Teacher Chat",
+            "item": [
+                {
+                    "name": "Chat Inbox",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "const json=pm.response.json(); if(json.success && json.data.conversations.length){pm.collectionVariables.set('conversationId',json.data.conversations[0].conversationId);}"
+                                ]
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "GET",
+                        "url": {
+                            "raw": "{{baseUrl}}/api/teacher/chat/conversations",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "api",
+                                "teacher",
+                                "chat",
+                                "conversations"
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "Conversation Messages",
+                    "request": {
+                        "method": "GET",
+                        "url": {
+                            "raw": "{{baseUrl}}/api/teacher/chat/conversations/{{conversationId}}/messages",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "api",
+                                "teacher",
+                                "chat",
+                                "conversations",
+                                "{{conversationId}}",
+                                "messages"
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "WRITE - Reply to Parent",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n    \"message\": \"Thank you. I have received your message.\"\n}",
+                            "options": {
+                                "raw": {
+                                    "language": "json"
+                                }
+                            }
+                        },
+                        "url": {
+                            "raw": "{{baseUrl}}/api/teacher/chat/conversations/{{conversationId}}/messages",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "api",
+                                "teacher",
+                                "chat",
+                                "conversations",
+                                "{{conversationId}}",
+                                "messages"
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "WRITE - Mark Parent Messages Read",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{}",
+                            "options": {
+                                "raw": {
+                                    "language": "json"
+                                }
+                            }
+                        },
+                        "url": {
+                            "raw": "{{baseUrl}}/api/teacher/chat/conversations/{{conversationId}}/read",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "api",
+                                "teacher",
+                                "chat",
+                                "conversations",
+                                "{{conversationId}}",
+                                "read"
                             ]
                         }
                     }

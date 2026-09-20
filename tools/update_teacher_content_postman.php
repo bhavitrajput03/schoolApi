@@ -5,7 +5,7 @@ $collection=json_decode((string)file_get_contents($file),true,64,JSON_THROW_ON_E
 
 foreach($collection['variable'] as &$variable){$existing[$variable['key']]=true;}
 unset($variable);
-foreach(['fcmToken'=>'','loginDeviceId'=>'android-device-key','noticeId'=>'','homeworkId'=>'','contentDate'=>date('Y-m-d'),'contentDueDate'=>date('Y-m-d',strtotime('+1 day'))] as $key=>$value){
+foreach(['fcmToken'=>'','loginDeviceId'=>'android-device-key','noticeId'=>'','homeworkId'=>'','conversationId'=>'','contentDate'=>date('Y-m-d'),'contentDueDate'=>date('Y-m-d',strtotime('+1 day'))] as $key=>$value){
     if(!isset($existing[$key]))$collection['variable'][]=['key'=>$key,'value'=>$value,'type'=>'string'];
 }
 
@@ -32,8 +32,17 @@ $requests[]=$make('WRITE - Publish Student Notice','/api/teacher/notices',['noti
 $requests[]=$make('WRITE - Publish Class Notice','/api/teacher/notices',['noticeType'=>'exam','targetType'=>'class','classId'=>'{{classId}}','title'=>'Exam schedule','body'=>'The exam schedule has been published.','attachmentUrl'=>null],'noticeId','notice');
 $requests[]=$make('WRITE - Publish School Notice (Admin)','/api/teacher/notices',['noticeType'=>'holiday','targetType'=>'school','title'=>'School holiday','body'=>'The school will remain closed tomorrow.','attachmentUrl'=>null],'noticeId','notice');
 $requests[]=$make('WRITE - Assign Homework','/api/teacher/homework',['classId'=>'{{classId}}','sectionId'=>'{{sectionId}}','subjectId'=>'{{subjectId}}','title'=>'Chapter revision','description'=>'Complete questions 1 to 10.','homeworkDate'=>'{{contentDate}}','dueDate'=>'{{contentDueDate}}','attachmentUrl'=>null],'homeworkId','homework');
+$requests[]=['name'=>'My Published Homework','request'=>['method'=>'GET','url'=>['raw'=>'{{baseUrl}}/api/teacher/homework?classId={{classId}}&sectionId={{sectionId}}&subjectId={{subjectId}}','host'=>['{{baseUrl}}'],'path'=>['api','teacher','homework'],'query'=>[['key'=>'classId','value'=>'{{classId}}'],['key'=>'sectionId','value'=>'{{sectionId}}'],['key'=>'subjectId','value'=>'{{subjectId}}']]]]];
+$requests[]=['name'=>'Homework Given to Student','request'=>['method'=>'GET','url'=>['raw'=>'{{baseUrl}}/api/teacher/students/{{studentId}}/homework','host'=>['{{baseUrl}}'],'path'=>['api','teacher','students','{{studentId}}','homework']]]];
 
 $collection['item']=array_values(array_filter($collection['item'],static fn(array $folder):bool=>($folder['name']??'')!=='06 Notices & Homework'));
 $collection['item'][]=['name'=>'06 Notices & Homework','item'=>$requests];
+$collection['item']=array_values(array_filter($collection['item'],static fn(array $folder):bool=>($folder['name']??'')!=='07 Teacher Chat'));
+$collection['item'][]=['name'=>'07 Teacher Chat','item'=>[
+    ['name'=>'Chat Inbox','event'=>[['listen'=>'test','script'=>['type'=>'text/javascript','exec'=>["const json=pm.response.json(); if(json.success && json.data.conversations.length){pm.collectionVariables.set('conversationId',json.data.conversations[0].conversationId);}"]]]],'request'=>['method'=>'GET','url'=>['raw'=>'{{baseUrl}}/api/teacher/chat/conversations','host'=>['{{baseUrl}}'],'path'=>['api','teacher','chat','conversations']]]],
+    ['name'=>'Conversation Messages','request'=>['method'=>'GET','url'=>['raw'=>'{{baseUrl}}/api/teacher/chat/conversations/{{conversationId}}/messages','host'=>['{{baseUrl}}'],'path'=>['api','teacher','chat','conversations','{{conversationId}}','messages']]]],
+    ['name'=>'WRITE - Reply to Parent','request'=>['method'=>'POST','header'=>$authHeader,'body'=>['mode'=>'raw','raw'=>json_encode(['message'=>'Thank you. I have received your message.'],JSON_PRETTY_PRINT|JSON_UNESCAPED_SLASHES),'options'=>['raw'=>['language'=>'json']]],'url'=>['raw'=>'{{baseUrl}}/api/teacher/chat/conversations/{{conversationId}}/messages','host'=>['{{baseUrl}}'],'path'=>['api','teacher','chat','conversations','{{conversationId}}','messages']]]],
+    ['name'=>'WRITE - Mark Parent Messages Read','request'=>['method'=>'POST','header'=>$authHeader,'body'=>['mode'=>'raw','raw'=>'{}','options'=>['raw'=>['language'=>'json']]],'url'=>['raw'=>'{{baseUrl}}/api/teacher/chat/conversations/{{conversationId}}/read','host'=>['{{baseUrl}}'],'path'=>['api','teacher','chat','conversations','{{conversationId}}','read']]]],
+]];
 file_put_contents($file,json_encode($collection,JSON_PRETTY_PRINT|JSON_UNESCAPED_SLASHES));
 echo "Teacher notice and homework requests added.\n";

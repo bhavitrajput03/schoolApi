@@ -1,7 +1,7 @@
 <?php
 declare(strict_types=1);
 namespace App\Core;
-use App\Controller\{AttendanceController,AuthController,AuthGatewayController,ChatController,ExamController,FeeController,HomeworkController,MarksController,NoticeController,NotificationController,ParentAppController,ParentAttendanceController,ParentAuthController,ParentController,ParentTeacherController,PaymentController,TeacherContentController,TeacherController};
+use App\Controller\{AttendanceController,AuthController,AuthGatewayController,ChatController,ExamController,FeeController,HomeworkController,MarksController,NoticeController,NotificationController,ParentAppController,ParentAttendanceController,ParentAuthController,ParentController,ParentTeacherController,PaymentController,TeacherChatController,TeacherContentController,TeacherController};
 final class App {
     public static function run(): void {
         self::headers();$r=new Request();
@@ -28,6 +28,13 @@ final class App {
             ['POST','#^/api/attendance$#',[AttendanceController::class,'save'],true],
             ['POST','#^/api/teacher/notices$#',[TeacherContentController::class,'createNotice'],true],
             ['POST','#^/api/teacher/homework$#',[TeacherContentController::class,'createHomework'],true],
+            ['GET','#^/api/teacher/homework$#',[TeacherContentController::class,'myHomework'],true],
+            ['GET','#^/api/teacher/students/(\d+)/homework$#',[TeacherContentController::class,'studentHomework'],true],
+            ['GET','#^/api/teacher/chat/conversations$#',[TeacherChatController::class,'inbox'],true],
+            ['GET','#^/api/teacher/chat/conversations/([^/]+)/messages$#',[TeacherChatController::class,'messages'],true],
+            ['POST','#^/api/teacher/chat/conversations/([^/]+)/messages$#',[TeacherChatController::class,'reply'],true],
+            ['POST','#^/api/teacher/chat/conversations/([^/]+)/read$#',[TeacherChatController::class,'read'],true],
+            ['POST','#^/api/teacher/devices/register$#',[TeacherController::class,'registerDevice'],true],
 
             ['GET','#^/api/parent/profile$#',[ParentController::class,'profile'],'parent'],
             ['GET','#^/api/parent/students$#',[ParentController::class,'students'],'parent'],
@@ -46,10 +53,12 @@ final class App {
             ['GET','#^/api/students/(\d+)/subject-teachers$#',[ParentTeacherController::class,'subjectTeachers'],'parent'],
             ['GET','#^/api/teachers/(\d+|[0-9a-fA-F-]{36})$#',[ParentTeacherController::class,'teacher'],'parent'],
             ['GET','#^/api/chat/contacts$#',[ChatController::class,'contacts'],'parent'],
-            ['GET','#^/api/chat/conversations/(\d+)$#',[ChatController::class,'history'],'parent'],
+            ['GET','#^/api/chat/conversations$#',[ChatController::class,'inbox'],'parent'],
+            ['GET','#^/api/chat/conversations/([^/]+)$#',[ChatController::class,'history'],'parent'],
+            ['GET','#^/api/chat/conversations/([^/]+)/messages$#',[ChatController::class,'history'],'parent'],
             ['POST','#^/api/chat/messages$#',[ChatController::class,'send'],'parent'],
             ['POST','#^/api/chat/attachments$#',[ChatController::class,'attachment'],'parent'],
-            ['POST','#^/api/chat/conversations/(\d+)/read$#',[ChatController::class,'read'],'parent'],
+            ['POST','#^/api/chat/conversations/([^/]+)/read$#',[ChatController::class,'read'],'parent'],
             ['GET','#^/api/students/(\d+)/fees/summary$#',[FeeController::class,'summary'],'parent'],
             ['GET','#^/api/students/(\d+)/fees$#',[FeeController::class,'list'],'parent'],
             ['GET','#^/api/students/(\d+)/fees/(\d+)$#',[FeeController::class,'detail'],'parent'],

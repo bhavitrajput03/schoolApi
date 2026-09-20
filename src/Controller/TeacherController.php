@@ -1,8 +1,8 @@
 <?php
 declare(strict_types=1);
 namespace App\Controller;
-use App\Core\{Database,Request,Response};
-use App\Service\SchoolService;
+use App\Core\{Database,Request,Response,Validator};
+use App\Service\{DeviceService,SchoolService};
 final class TeacherController {
     public function dashboard(Request $r,array $u):never{$session=SchoolService::currentSession();$st=Database::connection()->prepare("SELECT COUNT(DISTINCT CONCAT(ClassID,':',SectionID)) FROM ApiTeacherAssignment WHERE ApiUserID=? AND OwnerSessionID=? AND IsActive=1");$st->execute([$u['ApiUserID'],$session['id']]);$id=self::identifier($u['ApiUserID']);Response::success(['teacher'=>['id'=>$id,'teacherId'=>$id,'apiUserId'=>$id,'employeeId'=>$u['EmployeeID']===null?null:(int)$u['EmployeeID'],'name'=>$u['DisplayName'],'role'=>$u['Role']],'academicSessionId'=>$session['id'],'academicSession'=>$session,'assignedClassSections'=>(int)$st->fetchColumn()]);}
     public function classes(Request $r,array $u):never{$st=Database::connection()->prepare("SELECT DISTINCT c.ClassmasterID id,c.Classmaster name,c.SNo sortOrder FROM ApiTeacherAssignment a JOIN ClassMaster c ON c.ClassmasterID=a.ClassID WHERE a.ApiUserID=? AND a.OwnerSessionID=? AND a.IsActive=1 ORDER BY c.SNo,c.Classmaster");$st->execute([$u['ApiUserID'],SchoolService::currentSessionId()]);Response::success($st->fetchAll());}
@@ -16,6 +16,10 @@ final class TeacherController {
               ORDER BY CASE WHEN ss.RollNo<>'' AND LEN(ss.RollNo)<=9 AND ss.RollNo NOT LIKE '%[^0-9]%'
                             THEN CONVERT(int,ss.RollNo) ELSE 2147483647 END,ss.RollNo,s.StudentName";
         $st=Database::connection()->prepare($sql);$st->execute([$session,$class,$section]);Response::success(['students'=>$st->fetchAll()]);
+    }
+    public function registerDevice(Request $r,array $u):never{
+        $d=$r->json();Validator::required($d,['deviceId','fcmToken','platform']);if(!in_array(strtolower((string)$d['platform']),['android','ios','web'],true))Response::error('platform must be android, ios or web.',422,'VALIDATION_ERROR');
+        DeviceService::teacher($d,$u['ApiUserID']);Response::success(['deviceId'=>(string)$d['deviceId'],'registered'=>true]);
     }
     private static function identifier(mixed $value):string|int{return is_int($value)||is_string($value)&&ctype_digit($value)?(int)$value:(string)$value;}
 }

@@ -27,7 +27,8 @@ $defs=[
 ['School & Settings','School','GET','/api/school'],['School & Settings','Academic Session','GET','/api/school/academic-session'],['School & Settings','App Config','GET','/api/app/config',false],['School & Settings','Settings','GET','/api/settings']];
 foreach($defs as $d){$protected=$d[4]??true;$add($d[0],$item($d[1],$d[2],$base.$d[3],null,$protected));}
 $add('Chat',$item('Chat Contacts','GET',"$base/api/chat/contacts?studentId={{studentId}}"));
-$add('Chat',$item('Chat History','GET',"$base/api/chat/conversations/{{conversationId}}"));
+$add('Chat',$item('Chat Inbox','GET',"$base/api/chat/conversations?studentId={{studentId}}",null,true,["let j=pm.response.json(); if(j.success && j.data.conversations.length){pm.environment.set('conversationId',j.data.conversations[0].conversationId);}"]));
+$add('Chat',$item('Chat History','GET',"$base/api/chat/conversations/{{conversationId}}/messages"));
 $add('Chat',$item('Send Message','POST',"$base/api/chat/messages",['studentId'=>'{{studentId}}','teacherId'=>'{{teacherId}}','message'=>'Hello teacher']));
 $add('Chat',$item('Send Attachment','POST',"$base/api/chat/attachments",['studentId'=>'{{studentId}}','teacherId'=>'{{teacherId}}','message'=>'Please check','fileName'=>'homework.pdf','mimeType'=>'application/pdf','fileUrl'=>'https://example.com/homework.pdf','fileSize'=>12345]));
 $add('Chat',$item('Mark Conversation Read','POST',"$base/api/chat/conversations/{{conversationId}}/read",[]));

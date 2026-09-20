@@ -1482,6 +1482,37 @@
                     ]
                 },
                 {
+                    "name": "Chat Inbox",
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{accessToken}}",
+                                "type": "text"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{baseUrl}}/api/chat/conversations?studentId={{studentId}}",
+                            "host": [
+                                "{{baseUrl}}/api/chat/conversations?studentId={{studentId}}"
+                            ]
+                        }
+                    },
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "pm.test('Success status',()=>pm.expect(pm.response.code).to.be.below(500));",
+                                    "let j=pm.response.json(); if(j.success && j.data.conversations.length){pm.environment.set('conversationId',j.data.conversations[0].conversationId);}"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
                     "name": "Chat History",
                     "request": {
                         "method": "GET",
@@ -1493,9 +1524,9 @@
                             }
                         ],
                         "url": {
-                            "raw": "{{baseUrl}}/api/chat/conversations/{{conversationId}}",
+                            "raw": "{{baseUrl}}/api/chat/conversations/{{conversationId}}/messages",
                             "host": [
-                                "{{baseUrl}}/api/chat/conversations/{{conversationId}}"
+                                "{{baseUrl}}/api/chat/conversations/{{conversationId}}/messages"
                             ]
                         }
                     },
